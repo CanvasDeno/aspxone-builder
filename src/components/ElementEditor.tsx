@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -25,6 +24,13 @@ const ElementEditor: React.FC<ElementEditorProps> = ({
   useEffect(() => {
     setEditedElement(selectedElement);
   }, [selectedElement]);
+
+  // Auto-save whenever editedElement changes
+  useEffect(() => {
+    if (editedElement && selectedElement && editedElement.id === selectedElement.id) {
+      onUpdateElement(editedElement);
+    }
+  }, [editedElement, onUpdateElement, selectedElement]);
 
   if (!selectedElement || !editedElement) {
     return (
@@ -164,9 +170,6 @@ const ElementEditor: React.FC<ElementEditorProps> = ({
         {renderTypeSpecificFields()}
 
         <div className="pt-4 space-y-2">
-          <Button onClick={handleSave} className="w-full bg-blue-600 hover:bg-blue-700">
-            Save Changes
-          </Button>
           <Button onClick={handleDelete} variant="destructive" className="w-full">
             Delete Element
           </Button>

@@ -1,7 +1,9 @@
+
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { PageElement } from '@/pages/Index';
@@ -124,6 +126,19 @@ const ElementEditor: React.FC<ElementEditorProps> = ({
             </div>
           </>
         );
+      case 'csharp':
+        return (
+          <div className="space-y-2">
+            <Label htmlFor="code">C# Code</Label>
+            <Textarea
+              id="code"
+              value={editedElement.properties.code || ''}
+              onChange={(e) => handlePropertyChange('code', e.target.value)}
+              placeholder="Enter your C# code here..."
+              className="min-h-[200px] font-mono text-sm"
+            />
+          </div>
+        );
       default:
         return null;
     }
@@ -137,7 +152,7 @@ const ElementEditor: React.FC<ElementEditorProps> = ({
       <CardContent className="space-y-4">
         <div className="space-y-2">
           <Label htmlFor="content">
-            {editedElement.type === 'image' ? 'Alt Text' : 'Text'}
+            {editedElement.type === 'image' ? 'Alt Text' : editedElement.type === 'csharp' ? 'Description' : 'Text'}
           </Label>
           <Input
             id="content"
@@ -147,7 +162,7 @@ const ElementEditor: React.FC<ElementEditorProps> = ({
           />
         </div>
 
-        {editedElement.type !== 'image' && (
+        {editedElement.type !== 'image' && editedElement.type !== 'csharp' && (
           <div className="space-y-2">
             <Label htmlFor="size">Size (approx)</Label>
             <Select value={editedElement.properties.size} onValueChange={(value) => handlePropertyChange('size', value)}>

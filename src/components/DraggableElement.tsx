@@ -67,6 +67,15 @@ const DraggableElement: React.FC<DraggableElementProps> = ({
             className={`${baseClass} max-w-full h-auto`}
           />
         );
+      case 'csharp':
+        return (
+          <div className={`${baseClass} bg-gray-100 border border-gray-300 rounded p-3`}>
+            <div className="text-sm font-semibold text-gray-700 mb-2">{element.content}</div>
+            <pre className="text-xs font-mono bg-gray-50 p-2 rounded overflow-auto">
+              @{`{\n${element.properties.code || ''}\n}`}
+            </pre>
+          </div>
+        );
       default:
         return <div className={baseClass}>{element.content}</div>;
     }

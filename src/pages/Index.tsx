@@ -8,7 +8,7 @@ import ElementEditor from '@/components/ElementEditor';
 
 export interface PageElement {
   id: string;
-  type: 'heading' | 'paragraph' | 'link' | 'button' | 'image';
+  type: 'heading' | 'paragraph' | 'link' | 'button' | 'image' | 'csharp';
   content: string;
   properties: {
     level?: string;
@@ -16,6 +16,7 @@ export interface PageElement {
     href?: string;
     src?: string;
     alt?: string;
+    code?: string;
     [key: string]: any;
   };
 }
@@ -77,6 +78,8 @@ const Index = () => {
           return `<button class="btn btn-primary ${getSizeClass(element.properties.size)}">${element.content}</button>`;
         case 'image':
           return `<img src="${element.properties.src || ''}" alt="${element.properties.alt || ''}" class="img-fluid" />`;
+        case 'csharp':
+          return `@{\n${element.properties.code || ''}\n}`;
         default:
           return '';
       }
@@ -155,6 +158,7 @@ function getDefaultContent(type: PageElement['type']): string {
     case 'link': return 'New Link';
     case 'button': return 'New Button';
     case 'image': return 'Image';
+    case 'csharp': return 'C# Code Block';
     default: return '';
   }
 }
@@ -166,6 +170,7 @@ function getDefaultProperties(type: PageElement['type']): PageElement['propertie
     case 'link': return { size: 'M', href: '#' };
     case 'button': return { size: 'M' };
     case 'image': return { src: '', alt: '' };
+    case 'csharp': return { code: '// Enter your C# code here\nstring message = "Hello World";' };
     default: return {};
   }
 }

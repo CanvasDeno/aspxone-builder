@@ -103,6 +103,18 @@ const ElementEditor: React.FC<ElementEditorProps> = ({
             />
           </div>
         );
+      case 'button':
+        return (
+          <div className="space-y-2">
+            <Label htmlFor="href">Link URL</Label>
+            <Input
+              id="href"
+              value={editedElement.properties.href || ''}
+              onChange={(e) => handlePropertyChange('href', e.target.value)}
+              placeholder="https://example.com"
+            />
+          </div>
+        );
       case 'image':
         return (
           <>
@@ -129,12 +141,25 @@ const ElementEditor: React.FC<ElementEditorProps> = ({
       case 'csharp':
         return (
           <div className="space-y-2">
-            <Label htmlFor="code">C# Code</Label>
+            <Label htmlFor="code">C# Code Block</Label>
             <Textarea
               id="code"
               value={editedElement.properties.code || ''}
               onChange={(e) => handlePropertyChange('code', e.target.value)}
               placeholder="Enter your C# code here..."
+              className="min-h-[200px] font-mono text-sm"
+            />
+          </div>
+        );
+      case 'pagecode':
+        return (
+          <div className="space-y-2">
+            <Label htmlFor="code">C# Page Code</Label>
+            <Textarea
+              id="code"
+              value={editedElement.properties.code || ''}
+              onChange={(e) => handlePropertyChange('code', e.target.value)}
+              placeholder="Enter your C# page code here..."
               className="min-h-[200px] font-mono text-sm"
             />
           </div>
@@ -152,7 +177,9 @@ const ElementEditor: React.FC<ElementEditorProps> = ({
       <CardContent className="space-y-4">
         <div className="space-y-2">
           <Label htmlFor="content">
-            {editedElement.type === 'image' ? 'Alt Text' : editedElement.type === 'csharp' ? 'Description' : 'Text'}
+            {editedElement.type === 'image' ? 'Alt Text' : 
+             editedElement.type === 'csharp' ? 'Code Block Description' : 
+             editedElement.type === 'pagecode' ? 'Page Code Description' : 'Text'}
           </Label>
           <Input
             id="content"
@@ -162,7 +189,7 @@ const ElementEditor: React.FC<ElementEditorProps> = ({
           />
         </div>
 
-        {editedElement.type !== 'image' && editedElement.type !== 'csharp' && (
+        {editedElement.type !== 'image' && editedElement.type !== 'csharp' && editedElement.type !== 'pagecode' && (
           <div className="space-y-2">
             <Label htmlFor="size">Size (approx)</Label>
             <Select value={editedElement.properties.size} onValueChange={(value) => handlePropertyChange('size', value)}>

@@ -3,10 +3,10 @@ import React from 'react';
 import { useDrag } from 'react-dnd';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Type, FileText, Link, Square, Image, Code } from 'lucide-react';
+import { Type, FileText, Link, Square, Image, Code, FileCode } from 'lucide-react';
 
 interface ElementToolboxProps {
-  onAddElement: (type: 'heading' | 'paragraph' | 'link' | 'button' | 'image' | 'csharp') => void;
+  onAddElement: (type: 'heading' | 'paragraph' | 'link' | 'button' | 'image' | 'csharp' | 'pagecode') => void;
   onExport: () => void;
 }
 
@@ -17,7 +17,8 @@ const ElementToolbox: React.FC<ElementToolboxProps> = ({ onAddElement, onExport 
     { type: 'link' as const, label: 'Add Link', icon: Link },
     { type: 'button' as const, label: 'Add Button', icon: Square },
     { type: 'image' as const, label: 'Add Image', icon: Image },
-    { type: 'csharp' as const, label: 'Add C# Code', icon: Code },
+    { type: 'pagecode' as const, label: 'Add Page Code', icon: FileCode },
+    { type: 'csharp' as const, label: 'Add Code Block', icon: Code },
   ];
 
   return (

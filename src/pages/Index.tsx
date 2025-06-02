@@ -8,7 +8,7 @@ import ElementEditor from '@/components/ElementEditor';
 
 export interface PageElement {
   id: string;
-  type: 'heading' | 'paragraph' | 'link' | 'button' | 'image' | 'csharp';
+  type: 'heading' | 'paragraph' | 'link' | 'button' | 'image' | 'csharp' | 'pagecode';
   content: string;
   properties: {
     level?: string;
@@ -75,11 +75,13 @@ const Index = () => {
         case 'link':
           return `<a href="${element.properties.href || '#'}" class="${getSizeClass(element.properties.size)}">${element.content}</a>`;
         case 'button':
-          return `<button class="btn btn-primary ${getSizeClass(element.properties.size)}">${element.content}</button>`;
+          return `<a href="${element.properties.href || '#'}" class="btn btn-primary ${getSizeClass(element.properties.size)}">${element.content}</a>`;
         case 'image':
           return `<img src="${element.properties.src || ''}" alt="${element.properties.alt || ''}" class="img-fluid" />`;
         case 'csharp':
           return `@{\n${element.properties.code || ''}\n}`;
+        case 'pagecode':
+          return element.properties.code || '';
         default:
           return '';
       }
@@ -159,6 +161,7 @@ function getDefaultContent(type: PageElement['type']): string {
     case 'button': return 'New Button';
     case 'image': return 'Image';
     case 'csharp': return 'C# Code Block';
+    case 'pagecode': return 'C# Page Code';
     default: return '';
   }
 }
@@ -168,9 +171,10 @@ function getDefaultProperties(type: PageElement['type']): PageElement['propertie
     case 'heading': return { level: 'H1', size: 'XL' };
     case 'paragraph': return { size: 'M' };
     case 'link': return { size: 'M', href: '#' };
-    case 'button': return { size: 'M' };
+    case 'button': return { size: 'M', href: '#' };
     case 'image': return { src: '', alt: '' };
     case 'csharp': return { code: '// Enter your C# code here\nstring message = "Hello World";' };
+    case 'pagecode': return { code: '// Enter your C# page code here\nstring pageTitle = "My Page";' };
     default: return {};
   }
 }

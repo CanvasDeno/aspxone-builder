@@ -139,30 +139,57 @@ const ElementEditor: React.FC<ElementEditorProps> = ({
           </>
         );
       case 'csharp':
-        return (
-          <div className="space-y-2">
-            <Label htmlFor="code">C# Code Block</Label>
-            <Textarea
-              id="code"
-              value={editedElement.properties.code || ''}
-              onChange={(e) => handlePropertyChange('code', e.target.value)}
-              placeholder="Enter your C# code here..."
-              className="min-h-[200px] font-mono text-sm"
-            />
-          </div>
-        );
       case 'pagecode':
         return (
-          <div className="space-y-2">
-            <Label htmlFor="code">C# Page Code</Label>
-            <Textarea
-              id="code"
-              value={editedElement.properties.code || ''}
-              onChange={(e) => handlePropertyChange('code', e.target.value)}
-              placeholder="Enter your C# page code here..."
-              className="min-h-[200px] font-mono text-sm"
-            />
-          </div>
+          <>
+            <div className="space-y-2">
+              <Label htmlFor="scriptingMode">Scripting Mode</Label>
+              <Select 
+                value={editedElement.properties.scriptingMode || 'razor'} 
+                onValueChange={(value) => handlePropertyChange('scriptingMode', value)}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="razor">ASP.NET Razor</SelectItem>
+                  <SelectItem value="mvc">ASP.NET MVC</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              <div className="space-y-2">
+                <Label htmlFor="backgroundColor">Background Color</Label>
+                <Input
+                  id="backgroundColor"
+                  type="color"
+                  value={editedElement.properties.backgroundColor || '#f8f9fa'}
+                  onChange={(e) => handlePropertyChange('backgroundColor', e.target.value)}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="textColor">Text Color</Label>
+                <Input
+                  id="textColor"
+                  type="color"
+                  value={editedElement.properties.textColor || '#212529'}
+                  onChange={(e) => handlePropertyChange('textColor', e.target.value)}
+                />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="code">
+                {editedElement.type === 'csharp' ? 'C# Code Block' : 'C# Page Code'}
+              </Label>
+              <Textarea
+                id="code"
+                value={editedElement.properties.code || ''}
+                onChange={(e) => handlePropertyChange('code', e.target.value)}
+                placeholder="Enter your C# code here..."
+                className="min-h-[200px] font-mono text-sm"
+              />
+            </div>
+          </>
         );
       default:
         return null;

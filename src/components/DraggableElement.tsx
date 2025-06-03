@@ -68,20 +68,38 @@ const DraggableElement: React.FC<DraggableElementProps> = ({
           />
         );
       case 'csharp':
+        const csharpStyle = {
+          backgroundColor: element.properties.backgroundColor || '#f8f9fa',
+          color: element.properties.textColor || '#212529'
+        };
+        const csharpCode = element.properties.scriptingMode === 'mvc' 
+          ? `<% ${element.properties.code || ''} %>`
+          : `@{\n${element.properties.code || ''}\n}`;
         return (
-          <div className={`${baseClass} bg-gray-100 border border-gray-300 rounded p-3`}>
-            <div className="text-sm font-semibold text-gray-700 mb-2">{element.content}</div>
-            <pre className="text-xs font-mono bg-gray-50 p-2 rounded overflow-auto">
-              @{`{\n${element.properties.code || ''}\n}`}
+          <div className={`${baseClass} border border-gray-300 rounded p-3`} style={csharpStyle}>
+            <div className="text-sm font-semibold mb-2">
+              {element.content} ({element.properties.scriptingMode === 'mvc' ? 'MVC' : 'Razor'})
+            </div>
+            <pre className="text-xs font-mono p-2 rounded overflow-auto" style={{ backgroundColor: 'rgba(0,0,0,0.05)' }}>
+              {csharpCode}
             </pre>
           </div>
         );
       case 'pagecode':
+        const pageCodeStyle = {
+          backgroundColor: element.properties.backgroundColor || '#fff3cd',
+          color: element.properties.textColor || '#856404'
+        };
+        const pageCode = element.properties.scriptingMode === 'mvc'
+          ? `<%\n${element.properties.code || ''}\n%>`
+          : element.properties.code || '';
         return (
-          <div className={`${baseClass} bg-yellow-50 border border-yellow-300 rounded p-3`}>
-            <div className="text-sm font-semibold text-yellow-700 mb-2">{element.content}</div>
-            <pre className="text-xs font-mono bg-yellow-100 p-2 rounded overflow-auto">
-              {element.properties.code || ''}
+          <div className={`${baseClass} border border-yellow-300 rounded p-3`} style={pageCodeStyle}>
+            <div className="text-sm font-semibold mb-2">
+              {element.content} ({element.properties.scriptingMode === 'mvc' ? 'MVC' : 'Razor'})
+            </div>
+            <pre className="text-xs font-mono p-2 rounded overflow-auto" style={{ backgroundColor: 'rgba(0,0,0,0.05)' }}>
+              {pageCode}
             </pre>
           </div>
         );

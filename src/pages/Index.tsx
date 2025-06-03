@@ -1,4 +1,3 @@
-
 import React, { useState, useCallback } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
@@ -17,6 +16,9 @@ export interface PageElement {
     src?: string;
     alt?: string;
     code?: string;
+    scriptingMode?: 'razor' | 'mvc';
+    backgroundColor?: string;
+    textColor?: string;
     [key: string]: any;
   };
 }
@@ -79,9 +81,15 @@ const Index = () => {
         case 'image':
           return `<img src="${element.properties.src || ''}" alt="${element.properties.alt || ''}" class="img-fluid" />`;
         case 'csharp':
-          return `@{\n${element.properties.code || ''}\n}`;
+          const csharpCode = element.properties.scriptingMode === 'mvc' 
+            ? `<% ${element.properties.code || ''} %>`
+            : `@{\n${element.properties.code || ''}\n}`;
+          return csharpCode;
         case 'pagecode':
-          return element.properties.code || '';
+          const pageCode = element.properties.scriptingMode === 'mvc'
+            ? `<%\n${element.properties.code || ''}\n%>`
+            : element.properties.code || '';
+          return pageCode;
         default:
           return '';
       }
@@ -173,8 +181,18 @@ function getDefaultProperties(type: PageElement['type']): PageElement['propertie
     case 'link': return { size: 'M', href: '#' };
     case 'button': return { size: 'M', href: '#' };
     case 'image': return { src: '', alt: '' };
-    case 'csharp': return { code: '// Enter your C# code here\nstring message = "Hello World";' };
-    case 'pagecode': return { code: '// Enter your C# page code here\nstring pageTitle = "My Page";' };
+    case 'csharp': return { 
+      code: '// Enter your C# code here\nstring message = "Hello World";',
+      scriptingMode: 'razor',
+      backgroundColor: '#f8f9fa',
+      textColor: '#212529'
+    };
+    case 'pagecode': return { 
+      code: '// Enter your C# page code here\nstring pageTitle = "My Page";',
+      scriptingMode: 'razor',
+      backgroundColor: '#fff3cd',
+      textColor: '#856404'
+    };
     default: return {};
   }
 }

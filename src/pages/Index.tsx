@@ -1,4 +1,3 @@
-
 import React, { useState, useCallback } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
@@ -48,13 +47,14 @@ const Index = () => {
       // Add to row
       setElements(prev => prev.map(el => {
         if (el.id === parentId && el.type === 'row') {
-          return {
+          const updatedElement = {
             ...el,
             properties: {
               ...el.properties,
               children: [...(el.properties.children || []), newElement]
             }
           };
+          return updatedElement;
         }
         return el;
       }));

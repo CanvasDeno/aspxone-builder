@@ -52,6 +52,7 @@ const DraggableElement: React.FC<DraggableElementProps> = ({
       // Handle dropping new elements into rows
       if (item.type && element.type === 'row' && onAddElement) {
         onAddElement(item.type as PageElement['type'], element.id);
+        return;
       }
     },
     collect: (monitor) => ({
@@ -74,43 +75,51 @@ const DraggableElement: React.FC<DraggableElementProps> = ({
       case 'row':
         return (
           <div 
-            className={`${baseClass} border-2 border-dashed border-gray-300 p-4 rounded ${
+            className={`${baseClass} border-2 border-dashed border-gray-300 p-4 rounded min-h-[100px] ${
               isOver ? 'border-blue-400 bg-blue-50' : ''
             }`}
             style={elementStyle}
           >
             <div className="text-sm font-medium text-gray-600 mb-2">{element.content}</div>
-            <div className="flex flex-wrap gap-4">
-              {element.properties.children?.map((child, childIndex) => (
-                <div key={child.id} className="flex-1 min-w-[200px]">
-                  <DraggableElement
-                    element={child}
-                    index={childIndex}
-                    isSelected={isSelected}
-                    onSelect={onSelect}
-                    onReorder={(dragIndex, hoverIndex) => {
-                      // Handle reordering within row
-                      const newChildren = [...(element.properties.children || [])];
-                      const draggedElement = newChildren[dragIndex];
-                      newChildren.splice(dragIndex, 1);
-                      newChildren.splice(hoverIndex, 0, draggedElement);
-                      
-                      const updatedElement = {
-                        ...element,
-                        properties: { ...element.properties, children: newChildren }
-                      };
-                      onSelect(updatedElement);
-                    }}
-                    onAddElement={onAddElement}
-                    parentId={element.id}
-                  />
-                </div>
-              )) || (
-                <div className="text-gray-400 text-center py-8 w-full">
-                  Drop elements here to add them to this row
-                </div>
-              )}
-            </div>
+            {element.properties.children && element.properties.children.length > 0 ? (
+              <div className="flex flex-wrap gap-4">
+                {element.properties.children.map((child, childIndex) => (
+                  <div key={child.id} className="flex-1 min-w-[200px]">
+                    <DraggableElement
+                      element={child}
+                      index={childIndex}
+                      isSelected={isSelected}
+                      onSelect={onSelect}
+                      onReorder={(dragIndex, hoverIndex) => {
+                        // Handle reordering within row
+                        if (onAddElement) {
+                          const newChildren = [...(element.properties.children || [])];
+                          const draggedElement = newChildren[dragIndex];
+                          newChildren.splice(dragIndex, 1);
+                          newChildren.splice(hoverIndex, 0, draggedElement);
+                          
+                          const updatedElement = {
+                            ...element,
+                            properties: { ...element.properties, children: newChildren }
+                          };
+                          onSelect(updatedElement);
+                        }
+                      }}
+                      onAddElement={onAddElement}
+                      parentId={element.id}
+                    />
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-gray-400 text-center py-8 w-full border-2 border-dashed border-gray-200 rounded">
+                {isOver ? (
+                  <p className="text-blue-600 font-medium">Drop element here!</p>
+                ) : (
+                  <p>Drag elements here to add them to this row</p>
+                )}
+              </div>
+            )}
           </div>
         );
       case 'heading':

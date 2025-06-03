@@ -176,11 +176,11 @@ function getDefaultContent(type: PageElement['type']): string {
 
 function getDefaultProperties(type: PageElement['type']): PageElement['properties'] {
   switch (type) {
-    case 'heading': return { level: 'H1', size: 'XL' };
-    case 'paragraph': return { size: 'M' };
-    case 'link': return { size: 'M', href: '#' };
-    case 'button': return { size: 'M', href: '#' };
-    case 'image': return { src: '', alt: '' };
+    case 'heading': return { level: 'H1', size: 'XL', backgroundColor: 'transparent', textColor: '#000000' };
+    case 'paragraph': return { size: 'M', backgroundColor: 'transparent', textColor: '#000000' };
+    case 'link': return { size: 'M', href: '#', backgroundColor: 'transparent', textColor: '#2563eb' };
+    case 'button': return { size: 'M', href: '#', backgroundColor: '#2563eb', textColor: '#ffffff' };
+    case 'image': return { src: '', alt: '', backgroundColor: 'transparent' };
     case 'csharp': return { 
       code: '// Enter your C# code here\nstring message = "Hello World";',
       scriptingMode: 'razor',

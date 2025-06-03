@@ -48,35 +48,57 @@ const DraggableElement: React.FC<DraggableElementProps> = ({
   const renderElement = () => {
     const sizeClass = getSizeClass(element.properties.size);
     const baseClass = `${sizeClass} ${isSelected ? 'ring-2 ring-blue-500' : ''}`;
+    
+    const elementStyle = {
+      backgroundColor: element.properties.backgroundColor === 'transparent' ? 'transparent' : element.properties.backgroundColor || 'transparent',
+      color: element.properties.textColor || 'inherit'
+    };
 
     switch (element.type) {
       case 'heading':
         const HeadingTag = element.properties.level?.toLowerCase() as keyof JSX.IntrinsicElements || 'h1';
-        return React.createElement(HeadingTag, { className: baseClass }, element.content);
+        return React.createElement(HeadingTag, { 
+          className: baseClass,
+          style: elementStyle
+        }, element.content);
       case 'paragraph':
-        return <p className={baseClass}>{element.content}</p>;
+        return <p className={baseClass} style={elementStyle}>{element.content}</p>;
       case 'link':
-        return <a href={element.properties.href || '#'} className={`${baseClass} text-blue-600 underline`}>{element.content}</a>;
+        return (
+          <a 
+            href={element.properties.href || '#'} 
+            className={`${baseClass} underline`}
+            style={elementStyle}
+          >
+            {element.content}
+          </a>
+        );
       case 'button':
-        return <a href={element.properties.href || '#'} className={`${baseClass} px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 inline-block`}>{element.content}</a>;
+        return (
+          <a 
+            href={element.properties.href || '#'} 
+            className={`${baseClass} px-4 py-2 rounded hover:opacity-80 inline-block`}
+            style={elementStyle}
+          >
+            {element.content}
+          </a>
+        );
       case 'image':
         return (
-          <img 
-            src={element.properties.src || 'https://via.placeholder.com/300x200'} 
-            alt={element.properties.alt || ''} 
-            className={`${baseClass} max-w-full h-auto`}
-          />
+          <div style={{ backgroundColor: elementStyle.backgroundColor }}>
+            <img 
+              src={element.properties.src || 'https://via.placeholder.com/300x200'} 
+              alt={element.properties.alt || ''} 
+              className={`${baseClass} max-w-full h-auto`}
+            />
+          </div>
         );
       case 'csharp':
-        const csharpStyle = {
-          backgroundColor: element.properties.backgroundColor || '#f8f9fa',
-          color: element.properties.textColor || '#212529'
-        };
         const csharpCode = element.properties.scriptingMode === 'mvc' 
           ? `<% ${element.properties.code || ''} %>`
           : `@{\n${element.properties.code || ''}\n}`;
         return (
-          <div className={`${baseClass} border border-gray-300 rounded p-3`} style={csharpStyle}>
+          <div className={`${baseClass} border border-gray-300 rounded p-3`} style={elementStyle}>
             <div className="text-sm font-semibold mb-2">
               {element.content} ({element.properties.scriptingMode === 'mvc' ? 'MVC' : 'Razor'})
             </div>
@@ -86,15 +108,11 @@ const DraggableElement: React.FC<DraggableElementProps> = ({
           </div>
         );
       case 'pagecode':
-        const pageCodeStyle = {
-          backgroundColor: element.properties.backgroundColor || '#fff3cd',
-          color: element.properties.textColor || '#856404'
-        };
         const pageCode = element.properties.scriptingMode === 'mvc'
           ? `<%\n${element.properties.code || ''}\n%>`
           : element.properties.code || '';
         return (
-          <div className={`${baseClass} border border-yellow-300 rounded p-3`} style={pageCodeStyle}>
+          <div className={`${baseClass} border border-yellow-300 rounded p-3`} style={elementStyle}>
             <div className="text-sm font-semibold mb-2">
               {element.content} ({element.properties.scriptingMode === 'mvc' ? 'MVC' : 'Razor'})
             </div>
@@ -104,7 +122,7 @@ const DraggableElement: React.FC<DraggableElementProps> = ({
           </div>
         );
       default:
-        return <div className={baseClass}>{element.content}</div>;
+        return <div className={baseClass} style={elementStyle}>{element.content}</div>;
     }
   };
 

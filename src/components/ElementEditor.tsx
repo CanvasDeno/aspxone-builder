@@ -157,26 +157,6 @@ const ElementEditor: React.FC<ElementEditorProps> = ({
                 </SelectContent>
               </Select>
             </div>
-            <div className="grid grid-cols-2 gap-2">
-              <div className="space-y-2">
-                <Label htmlFor="backgroundColor">Background Color</Label>
-                <Input
-                  id="backgroundColor"
-                  type="color"
-                  value={editedElement.properties.backgroundColor || '#f8f9fa'}
-                  onChange={(e) => handlePropertyChange('backgroundColor', e.target.value)}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="textColor">Text Color</Label>
-                <Input
-                  id="textColor"
-                  type="color"
-                  value={editedElement.properties.textColor || '#212529'}
-                  onChange={(e) => handlePropertyChange('textColor', e.target.value)}
-                />
-              </div>
-            </div>
             <div className="space-y-2">
               <Label htmlFor="code">
                 {editedElement.type === 'csharp' ? 'C# Code Block' : 'C# Page Code'}
@@ -194,6 +174,45 @@ const ElementEditor: React.FC<ElementEditorProps> = ({
       default:
         return null;
     }
+  };
+
+  const renderColorFields = () => {
+    if (editedElement.type === 'image') {
+      return (
+        <div className="space-y-2">
+          <Label htmlFor="backgroundColor">Background Color</Label>
+          <Input
+            id="backgroundColor"
+            type="color"
+            value={editedElement.properties.backgroundColor || 'transparent'}
+            onChange={(e) => handlePropertyChange('backgroundColor', e.target.value)}
+          />
+        </div>
+      );
+    }
+
+    return (
+      <div className="grid grid-cols-2 gap-2">
+        <div className="space-y-2">
+          <Label htmlFor="backgroundColor">Background Color</Label>
+          <Input
+            id="backgroundColor"
+            type="color"
+            value={editedElement.properties.backgroundColor === 'transparent' ? '#ffffff' : editedElement.properties.backgroundColor || '#ffffff'}
+            onChange={(e) => handlePropertyChange('backgroundColor', e.target.value)}
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="textColor">Text Color</Label>
+          <Input
+            id="textColor"
+            type="color"
+            value={editedElement.properties.textColor || '#000000'}
+            onChange={(e) => handlePropertyChange('textColor', e.target.value)}
+          />
+        </div>
+      </div>
+    );
   };
 
   return (
@@ -237,6 +256,11 @@ const ElementEditor: React.FC<ElementEditorProps> = ({
         )}
 
         {renderTypeSpecificFields()}
+
+        <div className="border-t pt-4">
+          <Label className="text-sm font-medium mb-2 block">Colors</Label>
+          {renderColorFields()}
+        </div>
 
         <div className="pt-4 space-y-2">
           <Button onClick={handleDelete} variant="destructive" className="w-full">

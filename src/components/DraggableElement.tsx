@@ -1,3 +1,4 @@
+
 import React, { useRef } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 import { PageElement } from '@/pages/Index';
@@ -8,8 +9,6 @@ interface DraggableElementProps {
   isSelected: boolean;
   onSelect: (element: PageElement) => void;
   onReorder: (dragIndex: number, hoverIndex: number) => void;
-  onAddElement?: (type: PageElement['type'], parentId?: string) => void;
-  parentId?: string;
 }
 
 const DraggableElement: React.FC<DraggableElementProps> = ({
@@ -18,26 +17,24 @@ const DraggableElement: React.FC<DraggableElementProps> = ({
   isSelected,
   onSelect,
   onReorder,
-  onAddElement,
-  parentId,
 }) => {
   const ref = useRef<HTMLDivElement>(null);
 
   const [{ isDragging }, drag] = useDrag({
     type: 'canvas-element',
-    item: { index, parentId },
+    item: { index },
     collect: (monitor) => ({
       isDragging: monitor.isDragging(),
     }),
   });
 
-  const [{ isOver }, drop] = useDrop({
+  const [, drop] = useDrop({
     accept: ['canvas-element', 'element'],
-    hover: (item: { index?: number; type?: string; parentId?: string }) => {
+    hover: (item: { index?: number; type?: string }) => {
       if (!ref.current) return;
       
-      // Handle reordering within same container
-      if (item.index !== undefined && item.parentId === parentId) {
+      // Handle reordering
+      if (item.index !== undefined) {
         const dragIndex = item.index;
         const hoverIndex = index;
         
@@ -47,19 +44,6 @@ const DraggableElement: React.FC<DraggableElementProps> = ({
         item.index = hoverIndex;
       }
     },
-    drop: (item: { type?: string; index?: number; parentId?: string }, monitor) => {
-      // Only handle the drop if this is the immediate target (not a nested drop)
-      if (!monitor.isOver({ shallow: true })) return;
-      
-      // Handle dropping new elements from toolbox into rows
-      if (item.type && !item.index && element.type === 'row' && onAddElement) {
-        onAddElement(item.type as PageElement['type'], element.id);
-        return;
-      }
-    },
-    collect: (monitor) => ({
-      isOver: monitor.isOver({ shallow: true }),
-    }),
   });
 
   drag(drop(ref));
@@ -74,56 +58,6 @@ const DraggableElement: React.FC<DraggableElementProps> = ({
     };
 
     switch (element.type) {
-      case 'row':
-        return (
-          <div 
-            className={`${baseClass} border-2 border-dashed border-gray-300 p-4 rounded min-h-[100px] ${
-              isOver ? 'border-blue-400 bg-blue-50' : ''
-            }`}
-            style={elementStyle}
-          >
-            <div className="text-sm font-medium text-gray-600 mb-2">{element.content}</div>
-            {element.properties.children && element.properties.children.length > 0 ? (
-              <div className="flex flex-wrap gap-4">
-                {element.properties.children.map((child, childIndex) => (
-                  <div key={child.id} className="flex-1 min-w-[200px]">
-                    <DraggableElement
-                      element={child}
-                      index={childIndex}
-                      isSelected={isSelected}
-                      onSelect={onSelect}
-                      onReorder={(dragIndex, hoverIndex) => {
-                        // Handle reordering within row
-                        if (onAddElement) {
-                          const newChildren = [...(element.properties.children || [])];
-                          const draggedElement = newChildren[dragIndex];
-                          newChildren.splice(dragIndex, 1);
-                          newChildren.splice(hoverIndex, 0, draggedElement);
-                          
-                          const updatedElement = {
-                            ...element,
-                            properties: { ...element.properties, children: newChildren }
-                          };
-                          onSelect(updatedElement);
-                        }
-                      }}
-                      onAddElement={onAddElement}
-                      parentId={element.id}
-                    />
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-gray-400 text-center py-8 w-full border-2 border-dashed border-gray-200 rounded">
-                {isOver ? (
-                  <p className="text-blue-600 font-medium">Drop element here!</p>
-                ) : (
-                  <p>Drag elements here to add them to this row</p>
-                )}
-              </div>
-            )}
-          </div>
-        );
       case 'heading':
         const HeadingTag = element.properties.level?.toLowerCase() as keyof JSX.IntrinsicElements || 'h1';
         return React.createElement(HeadingTag, { 

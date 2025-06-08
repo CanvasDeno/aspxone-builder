@@ -1,3 +1,4 @@
+
 import React, { useState, useCallback } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
@@ -7,7 +8,7 @@ import ElementEditor from '@/components/ElementEditor';
 
 export interface PageElement {
   id: string;
-  type: 'heading' | 'paragraph' | 'link' | 'button' | 'image' | 'csharp' | 'pagecode' | 'row';
+  type: 'heading' | 'paragraph' | 'link' | 'button' | 'image' | 'csharp' | 'pagecode';
   content: string;
   properties: {
     level?: string;
@@ -19,7 +20,6 @@ export interface PageElement {
     scriptingMode?: 'razor' | 'mvc';
     backgroundColor?: string;
     textColor?: string;
-    children?: PageElement[];
     [key: string]: any;
   };
 }
@@ -35,7 +35,7 @@ const Index = () => {
   ]);
   const [selectedElement, setSelectedElement] = useState<PageElement | null>(elements[0]);
 
-  const addElement = useCallback((type: PageElement['type'], parentId?: string) => {
+  const addElement = useCallback((type: PageElement['type']) => {
     const newElement: PageElement = {
       id: Date.now().toString(),
       type,
@@ -43,65 +43,19 @@ const Index = () => {
       properties: getDefaultProperties(type)
     };
 
-    if (parentId) {
-      // Add to row
-      setElements(prev => prev.map(el => {
-        if (el.id === parentId && el.type === 'row') {
-          const updatedElement = {
-            ...el,
-            properties: {
-              ...el.properties,
-              children: [...(el.properties.children || []), newElement]
-            }
-          };
-          return updatedElement;
-        }
-        return el;
-      }));
-    } else {
-      // Add to main canvas
-      setElements(prev => [...prev, newElement]);
-    }
+    setElements(prev => [...prev, newElement]);
     setSelectedElement(newElement);
   }, []);
 
   const updateElement = useCallback((updatedElement: PageElement) => {
-    const updateInArray = (elements: PageElement[]): PageElement[] => {
-      return elements.map(el => {
-        if (el.id === updatedElement.id) {
-          return updatedElement;
-        }
-        if (el.type === 'row' && el.properties.children) {
-          return {
-            ...el,
-            properties: {
-              ...el.properties,
-              children: updateInArray(el.properties.children)
-            }
-          };
-        }
-        return el;
-      });
-    };
-
-    setElements(prev => updateInArray(prev));
+    setElements(prev => prev.map(el => 
+      el.id === updatedElement.id ? updatedElement : el
+    ));
     setSelectedElement(updatedElement);
   }, []);
 
   const deleteElement = useCallback((elementId: string) => {
-    const deleteFromArray = (elements: PageElement[]): PageElement[] => {
-      return elements.filter(el => {
-        if (el.id === elementId) {
-          return false;
-        }
-        if (el.type === 'row' && el.properties.children) {
-          el.properties.children = deleteFromArray(el.properties.children);
-        }
-        return true;
-      });
-    };
-
-    setElements(prev => deleteFromArray(prev));
+    setElements(prev => prev.filter(el => el.id !== elementId));
     setSelectedElement(null);
   }, []);
 
@@ -130,9 +84,6 @@ const Index = () => {
           return `<a href="${element.properties.href || '#'}" class="btn btn-primary ${getSizeClass(element.properties.size)}">${element.content}</a>`;
         case 'image':
           return `<img src="${element.properties.src || ''}" alt="${element.properties.alt || ''}" class="img-fluid" />`;
-        case 'row':
-          const childrenHtml = element.properties.children?.map(child => renderElement(child)).join('\n') || '';
-          return `<div class="row">\n${childrenHtml}\n</div>`;
         case 'csharp':
           const csharpCode = element.properties.scriptingMode === 'mvc' 
             ? `<% ${element.properties.code || ''} %>`
@@ -223,7 +174,6 @@ function getDefaultContent(type: PageElement['type']): string {
     case 'link': return 'New Link';
     case 'button': return 'New Button';
     case 'image': return 'Image';
-    case 'row': return 'Row Container';
     case 'csharp': return 'C# Code Block';
     case 'pagecode': return 'C# Page Code';
     default: return '';
@@ -237,7 +187,6 @@ function getDefaultProperties(type: PageElement['type']): PageElement['propertie
     case 'link': return { size: 'M', href: '#', backgroundColor: 'transparent', textColor: '#2563eb' };
     case 'button': return { size: 'M', href: '#', backgroundColor: '#2563eb', textColor: '#ffffff' };
     case 'image': return { src: '', alt: '', backgroundColor: 'transparent' };
-    case 'row': return { children: [], backgroundColor: 'transparent' };
     case 'csharp': return { 
       code: '// Enter your C# code here\nstring message = "Hello World";',
       scriptingMode: 'razor',

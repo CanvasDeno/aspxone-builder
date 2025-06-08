@@ -10,7 +10,7 @@ interface PageCanvasProps {
   selectedElement: PageElement | null;
   onSelectElement: (element: PageElement) => void;
   onReorderElements: (dragIndex: number, hoverIndex: number) => void;
-  onAddElement: (type: PageElement['type'], parentId?: string) => void;
+  onAddElement: (type: PageElement['type']) => void;
 }
 
 const PageCanvas: React.FC<PageCanvasProps> = ({
@@ -56,7 +56,6 @@ const PageCanvas: React.FC<PageCanvasProps> = ({
                   isSelected={selectedElement?.id === element.id}
                   onSelect={onSelectElement}
                   onReorder={onReorderElements}
-                  onAddElement={onAddElement}
                 />
               ))}
             </div>

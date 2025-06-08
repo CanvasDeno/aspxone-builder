@@ -8,7 +8,7 @@ import ElementEditor from '@/components/ElementEditor';
 
 export interface PageElement {
   id: string;
-  type: 'heading' | 'paragraph' | 'link' | 'button' | 'image' | 'csharp' | 'pagecode';
+  type: 'heading' | 'paragraph' | 'link' | 'button' | 'image' | 'csharp' | 'pagecode' | 'inline-row' | 'audio' | 'video';
   content: string;
   properties: {
     level?: string;
@@ -20,6 +20,11 @@ export interface PageElement {
     scriptingMode?: 'razor' | 'mvc';
     backgroundColor?: string;
     textColor?: string;
+    children?: PageElement[];
+    controls?: boolean;
+    autoplay?: boolean;
+    loop?: boolean;
+    muted?: boolean;
     [key: string]: any;
   };
 }
@@ -84,6 +89,21 @@ const Index = () => {
           return `<a href="${element.properties.href || '#'}" class="btn btn-primary ${getSizeClass(element.properties.size)}">${element.content}</a>`;
         case 'image':
           return `<img src="${element.properties.src || ''}" alt="${element.properties.alt || ''}" class="img-fluid" />`;
+        case 'audio':
+          const audioControls = element.properties.controls ? 'controls' : '';
+          const audioAutoplay = element.properties.autoplay ? 'autoplay' : '';
+          const audioLoop = element.properties.loop ? 'loop' : '';
+          const audioMuted = element.properties.muted ? 'muted' : '';
+          return `<audio src="${element.properties.src || ''}" ${audioControls} ${audioAutoplay} ${audioLoop} ${audioMuted}></audio>`;
+        case 'video':
+          const videoControls = element.properties.controls ? 'controls' : '';
+          const videoAutoplay = element.properties.autoplay ? 'autoplay' : '';
+          const videoLoop = element.properties.loop ? 'loop' : '';
+          const videoMuted = element.properties.muted ? 'muted' : '';
+          return `<video src="${element.properties.src || ''}" ${videoControls} ${videoAutoplay} ${videoLoop} ${videoMuted}></video>`;
+        case 'inline-row':
+          const childrenHtml = element.properties.children?.map(renderElement).join(' ') || '';
+          return `<div class="d-flex flex-row gap-2 align-items-center">${childrenHtml}</div>`;
         case 'csharp':
           const csharpCode = element.properties.scriptingMode === 'mvc' 
             ? `<% ${element.properties.code || ''} %>`
@@ -174,6 +194,9 @@ function getDefaultContent(type: PageElement['type']): string {
     case 'link': return 'New Link';
     case 'button': return 'New Button';
     case 'image': return 'Image';
+    case 'audio': return 'Audio Player';
+    case 'video': return 'Video Player';
+    case 'inline-row': return 'Inline Row';
     case 'csharp': return 'C# Code Block';
     case 'pagecode': return 'C# Page Code';
     default: return '';
@@ -187,6 +210,9 @@ function getDefaultProperties(type: PageElement['type']): PageElement['propertie
     case 'link': return { size: 'M', href: '#', backgroundColor: 'transparent', textColor: '#2563eb' };
     case 'button': return { size: 'M', href: '#', backgroundColor: '#2563eb', textColor: '#ffffff' };
     case 'image': return { src: '', alt: '', backgroundColor: 'transparent' };
+    case 'audio': return { src: '', controls: true, autoplay: false, loop: false, muted: false, backgroundColor: 'transparent' };
+    case 'video': return { src: '', controls: true, autoplay: false, loop: false, muted: false, backgroundColor: 'transparent' };
+    case 'inline-row': return { children: [], backgroundColor: 'transparent' };
     case 'csharp': return { 
       code: '// Enter your C# code here\nstring message = "Hello World";',
       scriptingMode: 'razor',

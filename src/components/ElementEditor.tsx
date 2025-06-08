@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
 import { PageElement } from '@/pages/Index';
 
 interface ElementEditorProps {
@@ -51,7 +52,7 @@ const ElementEditor: React.FC<ElementEditorProps> = ({
     setEditedElement(prev => prev ? { ...prev, content } : null);
   };
 
-  const handlePropertyChange = (key: string, value: string) => {
+  const handlePropertyChange = (key: string, value: string | boolean) => {
     setEditedElement(prev => prev ? {
       ...prev,
       properties: { ...prev.properties, [key]: value }
@@ -138,6 +139,64 @@ const ElementEditor: React.FC<ElementEditorProps> = ({
             </div>
           </>
         );
+      case 'audio':
+      case 'video':
+        return (
+          <>
+            <div className="space-y-2">
+              <Label htmlFor="src">{editedElement.type === 'audio' ? 'Audio' : 'Video'} URL</Label>
+              <Input
+                id="src"
+                value={editedElement.properties.src || ''}
+                onChange={(e) => handlePropertyChange('src', e.target.value)}
+                placeholder={`https://example.com/${editedElement.type}.${editedElement.type === 'audio' ? 'mp3' : 'mp4'}`}
+              />
+            </div>
+            <div className="space-y-3">
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="controls"
+                  checked={editedElement.properties.controls || false}
+                  onCheckedChange={(checked) => handlePropertyChange('controls', checked)}
+                />
+                <Label htmlFor="controls">Show Controls</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="autoplay"
+                  checked={editedElement.properties.autoplay || false}
+                  onCheckedChange={(checked) => handlePropertyChange('autoplay', checked)}
+                />
+                <Label htmlFor="autoplay">Autoplay</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="loop"
+                  checked={editedElement.properties.loop || false}
+                  onCheckedChange={(checked) => handlePropertyChange('loop', checked)}
+                />
+                <Label htmlFor="loop">Loop</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="muted"
+                  checked={editedElement.properties.muted || false}
+                  onCheckedChange={(checked) => handlePropertyChange('muted', checked)}
+                />
+                <Label htmlFor="muted">Muted</Label>
+              </div>
+            </div>
+          </>
+        );
+      case 'inline-row':
+        return (
+          <div className="space-y-2">
+            <Label>Row Container</Label>
+            <p className="text-sm text-gray-600">
+              This element acts as a container for inline elements. Drag buttons, images, or other elements into it to create a horizontal row.
+            </p>
+          </div>
+        );
       case 'csharp':
       case 'pagecode':
         return (
@@ -177,7 +236,7 @@ const ElementEditor: React.FC<ElementEditorProps> = ({
   };
 
   const renderColorFields = () => {
-    if (editedElement.type === 'image') {
+    if (editedElement.type === 'image' || editedElement.type === 'audio' || editedElement.type === 'video') {
       return (
         <div className="space-y-2">
           <Label htmlFor="backgroundColor">Background Color</Label>
@@ -225,7 +284,10 @@ const ElementEditor: React.FC<ElementEditorProps> = ({
           <Label htmlFor="content">
             {editedElement.type === 'image' ? 'Alt Text' : 
              editedElement.type === 'csharp' ? 'Code Block Description' : 
-             editedElement.type === 'pagecode' ? 'Page Code Description' : 'Text'}
+             editedElement.type === 'pagecode' ? 'Page Code Description' :
+             editedElement.type === 'audio' ? 'Audio Description' :
+             editedElement.type === 'video' ? 'Video Description' :
+             editedElement.type === 'inline-row' ? 'Row Description' : 'Text'}
           </Label>
           <Input
             id="content"
@@ -235,7 +297,7 @@ const ElementEditor: React.FC<ElementEditorProps> = ({
           />
         </div>
 
-        {editedElement.type !== 'image' && editedElement.type !== 'csharp' && editedElement.type !== 'pagecode' && (
+        {editedElement.type !== 'image' && editedElement.type !== 'csharp' && editedElement.type !== 'pagecode' && editedElement.type !== 'audio' && editedElement.type !== 'video' && editedElement.type !== 'inline-row' && (
           <div className="space-y-2">
             <Label htmlFor="size">Size (approx)</Label>
             <Select value={editedElement.properties.size} onValueChange={(value) => handlePropertyChange('size', value)}>

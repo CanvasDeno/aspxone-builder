@@ -188,15 +188,6 @@ const ElementEditor: React.FC<ElementEditorProps> = ({
             </div>
           </>
         );
-      case 'inline-row':
-        return (
-          <div className="space-y-2">
-            <Label>Row Container</Label>
-            <p className="text-sm text-gray-600">
-              This element acts as a container for inline elements. Drag buttons, images, or other elements into it to create a horizontal row.
-            </p>
-          </div>
-        );
       case 'csharp':
       case 'pagecode':
         return (
@@ -286,8 +277,7 @@ const ElementEditor: React.FC<ElementEditorProps> = ({
              editedElement.type === 'csharp' ? 'Code Block Description' : 
              editedElement.type === 'pagecode' ? 'Page Code Description' :
              editedElement.type === 'audio' ? 'Audio Description' :
-             editedElement.type === 'video' ? 'Video Description' :
-             editedElement.type === 'inline-row' ? 'Row Description' : 'Text'}
+             editedElement.type === 'video' ? 'Video Description' : 'Text'}
           </Label>
           <Input
             id="content"
@@ -297,7 +287,7 @@ const ElementEditor: React.FC<ElementEditorProps> = ({
           />
         </div>
 
-        {editedElement.type !== 'image' && editedElement.type !== 'csharp' && editedElement.type !== 'pagecode' && editedElement.type !== 'audio' && editedElement.type !== 'video' && editedElement.type !== 'inline-row' && (
+        {editedElement.type !== 'image' && editedElement.type !== 'csharp' && editedElement.type !== 'pagecode' && editedElement.type !== 'audio' && editedElement.type !== 'video' && (
           <div className="space-y-2">
             <Label htmlFor="size">Size (approx)</Label>
             <Select value={editedElement.properties.size} onValueChange={(value) => handlePropertyChange('size', value)}>

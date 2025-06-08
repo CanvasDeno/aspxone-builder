@@ -128,23 +128,6 @@ const DraggableElement: React.FC<DraggableElementProps> = ({
             </video>
           </div>
         );
-      case 'inline-row':
-        return (
-          <div className={`${baseClass} border border-dashed border-gray-400 rounded p-3 min-h-[60px]`} style={elementStyle}>
-            <div className="text-sm font-semibold mb-2">{element.content}</div>
-            <div className="flex flex-row gap-2 items-center flex-wrap">
-              {element.properties.children && element.properties.children.length > 0 ? (
-                element.properties.children.map((child: PageElement, childIndex: number) => (
-                  <div key={child.id} className="inline-block">
-                    {renderChildElement(child)}
-                  </div>
-                ))
-              ) : (
-                <div className="text-gray-500 text-sm italic">Drop elements here to create an inline row</div>
-              )}
-            </div>
-          </div>
-        );
       case 'csharp':
         const csharpCode = element.properties.scriptingMode === 'mvc' 
           ? `<% ${element.properties.code || ''} %>`
@@ -175,37 +158,6 @@ const DraggableElement: React.FC<DraggableElementProps> = ({
         );
       default:
         return <div className={baseClass} style={elementStyle}>{element.content}</div>;
-    }
-  };
-
-  const renderChildElement = (child: PageElement) => {
-    const sizeClass = getSizeClass(child.properties.size);
-    const childStyle = {
-      backgroundColor: child.properties.backgroundColor === 'transparent' ? 'transparent' : child.properties.backgroundColor || 'transparent',
-      color: child.properties.textColor || 'inherit'
-    };
-
-    switch (child.type) {
-      case 'button':
-        return (
-          <a 
-            href={child.properties.href || '#'} 
-            className={`${sizeClass} px-3 py-1 rounded hover:opacity-80 inline-block text-sm`}
-            style={childStyle}
-          >
-            {child.content}
-          </a>
-        );
-      case 'image':
-        return (
-          <img 
-            src={child.properties.src || 'https://via.placeholder.com/100x60'} 
-            alt={child.properties.alt || ''} 
-            className={`${sizeClass} h-12 w-auto object-cover rounded`}
-          />
-        );
-      default:
-        return <span className={sizeClass} style={childStyle}>{child.content}</span>;
     }
   };
 

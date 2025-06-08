@@ -1,12 +1,11 @@
-
 import React from 'react';
 import { useDrag } from 'react-dnd';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Type, FileText, Link, Square, Image, Code, FileCode, Minus, AudioLines, Video } from 'lucide-react';
+import { Type, FileText, Link, Square, Image, Code, FileCode, AudioLines, Video } from 'lucide-react';
 
 interface ElementToolboxProps {
-  onAddElement: (type: 'heading' | 'paragraph' | 'link' | 'button' | 'image' | 'csharp' | 'pagecode' | 'inline-row' | 'audio' | 'video') => void;
+  onAddElement: (type: 'heading' | 'paragraph' | 'link' | 'button' | 'image' | 'csharp' | 'pagecode' | 'audio' | 'video') => void;
   onExport: () => void;
 }
 
@@ -19,7 +18,6 @@ const ElementToolbox: React.FC<ElementToolboxProps> = ({ onAddElement, onExport 
     { type: 'image' as const, label: 'Add Image', icon: Image },
     { type: 'audio' as const, label: 'Add Audio', icon: AudioLines },
     { type: 'video' as const, label: 'Add Video', icon: Video },
-    { type: 'inline-row' as const, label: 'Add Inline Row', icon: Minus },
     { type: 'pagecode' as const, label: 'Add Page Code', icon: FileCode },
     { type: 'csharp' as const, label: 'Add Code Block', icon: Code },
   ];

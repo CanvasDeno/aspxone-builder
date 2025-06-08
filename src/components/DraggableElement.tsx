@@ -1,4 +1,3 @@
-
 import React, { useRef } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 import { PageElement } from '@/pages/Index';
@@ -48,9 +47,12 @@ const DraggableElement: React.FC<DraggableElementProps> = ({
         item.index = hoverIndex;
       }
     },
-    drop: (item: { type?: string; index?: number; parentId?: string }) => {
-      // Handle dropping new elements into rows
-      if (item.type && element.type === 'row' && onAddElement) {
+    drop: (item: { type?: string; index?: number; parentId?: string }, monitor) => {
+      // Only handle the drop if this is the immediate target (not a nested drop)
+      if (!monitor.isOver({ shallow: true })) return;
+      
+      // Handle dropping new elements from toolbox into rows
+      if (item.type && !item.index && element.type === 'row' && onAddElement) {
         onAddElement(item.type as PageElement['type'], element.id);
         return;
       }

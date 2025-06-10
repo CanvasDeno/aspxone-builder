@@ -73,61 +73,167 @@ const Index = () => {
   }, []);
 
   const exportAsHtml = useCallback(() => {
-    const renderElement = (element: PageElement): string => {
+    const indent = (level: number) => '  '.repeat(level);
+    
+    const renderElement = (element: PageElement, indentLevel: number = 3): string => {
+      const baseIndent = indent(indentLevel);
+      
       switch (element.type) {
         case 'heading':
           const level = element.properties.level?.toLowerCase() || 'h1';
-          const sizeClass = getSizeClass(element.properties.size);
-          return `<${level} class="${sizeClass}">${element.content}</${level}>`;
+          const headingClasses = getBootstrapClasses(element);
+          const headingStyles = getInlineStyles(element);
+          return `${baseIndent}<${level}${headingClasses}${headingStyles}>${element.content}</${level}>`;
+        
         case 'paragraph':
-          return `<p class="${getSizeClass(element.properties.size)}">${element.content}</p>`;
+          const paragraphClasses = getBootstrapClasses(element);
+          const paragraphStyles = getInlineStyles(element);
+          return `${baseIndent}<p${paragraphClasses}${paragraphStyles}>${element.content}</p>`;
+        
         case 'link':
-          return `<a href="${element.properties.href || '#'}" class="${getSizeClass(element.properties.size)}">${element.content}</a>`;
+          const linkClasses = getBootstrapClasses(element);
+          const linkStyles = getInlineStyles(element);
+          return `${baseIndent}<a href="${element.properties.href || '#'}"${linkClasses}${linkStyles}>${element.content}</a>`;
+        
         case 'button':
-          return `<a href="${element.properties.href || '#'}" class="btn btn-primary ${getSizeClass(element.properties.size)}">${element.content}</a>`;
+          const buttonClasses = getBootstrapClasses(element, 'btn btn-primary');
+          const buttonStyles = getInlineStyles(element);
+          return `${baseIndent}<a href="${element.properties.href || '#'}" class="btn btn-primary${buttonClasses.replace(' class="', '').replace('"', '')}"${buttonStyles}>${element.content}</a>`;
+        
         case 'image':
-          return `<img src="${element.properties.src || ''}" alt="${element.properties.alt || ''}" class="img-fluid" />`;
+          const imageStyles = getInlineStyles(element, false);
+          return `${baseIndent}<img src="${element.properties.src || ''}" alt="${element.properties.alt || ''}" class="img-fluid"${imageStyles} />`;
+        
         case 'audio':
-          const audioControls = element.properties.controls ? 'controls' : '';
-          const audioAutoplay = element.properties.autoplay ? 'autoplay' : '';
-          const audioLoop = element.properties.loop ? 'loop' : '';
-          const audioMuted = element.properties.muted ? 'muted' : '';
-          return `<audio src="${element.properties.src || ''}" ${audioControls} ${audioAutoplay} ${audioLoop} ${audioMuted}></audio>`;
+          const audioAttrs = [
+            element.properties.controls ? 'controls' : '',
+            element.properties.autoplay ? 'autoplay' : '',
+            element.properties.loop ? 'loop' : '',
+            element.properties.muted ? 'muted' : ''
+          ].filter(Boolean).join(' ');
+          const audioStyles = getInlineStyles(element, false);
+          return `${baseIndent}<div${getContainerStyles(element)}>
+${baseIndent}  <h6>${element.content}</h6>
+${baseIndent}  <audio src="${element.properties.src || ''}" ${audioAttrs}${audioStyles}>
+${baseIndent}    Your browser does not support the audio element.
+${baseIndent}  </audio>
+${baseIndent}</div>`;
+        
         case 'video':
-          const videoControls = element.properties.controls ? 'controls' : '';
-          const videoAutoplay = element.properties.autoplay ? 'autoplay' : '';
-          const videoLoop = element.properties.loop ? 'loop' : '';
-          const videoMuted = element.properties.muted ? 'muted' : '';
-          return `<video src="${element.properties.src || ''}" ${videoControls} ${videoAutoplay} ${videoLoop} ${videoMuted}></video>`;
+          const videoAttrs = [
+            element.properties.controls ? 'controls' : '',
+            element.properties.autoplay ? 'autoplay' : '',
+            element.properties.loop ? 'loop' : '',
+            element.properties.muted ? 'muted' : ''
+          ].filter(Boolean).join(' ');
+          const videoStyles = getInlineStyles(element, false);
+          return `${baseIndent}<div${getContainerStyles(element)}>
+${baseIndent}  <h6>${element.content}</h6>
+${baseIndent}  <video src="${element.properties.src || ''}" ${videoAttrs} class="w-100"${videoStyles}>
+${baseIndent}    Your browser does not support the video element.
+${baseIndent}  </video>
+${baseIndent}</div>`;
+        
         case 'csharp':
           const csharpCode = element.properties.scriptingMode === 'mvc' 
             ? `<% ${element.properties.code || ''} %>`
-            : `@{\n${element.properties.code || ''}\n}`;
-          return csharpCode;
+            : `@{\n    ${element.properties.code?.replace(/\n/g, '\n    ') || ''}\n}`;
+          return `${baseIndent}<!-- ${element.content} (${element.properties.scriptingMode === 'mvc' ? 'MVC' : 'Razor'}) -->
+${baseIndent}${csharpCode}`;
+        
         case 'pagecode':
           const pageCode = element.properties.scriptingMode === 'mvc'
-            ? `<%\n${element.properties.code || ''}\n%>`
+            ? `<%\n    ${element.properties.code?.replace(/\n/g, '\n    ') || ''}\n%>`
             : element.properties.code || '';
-          return pageCode;
+          return `${baseIndent}<!-- ${element.content} (${element.properties.scriptingMode === 'mvc' ? 'MVC' : 'Razor'}) -->
+${baseIndent}${pageCode}`;
+        
         default:
-          return '';
+          return `${baseIndent}<!-- Unknown element type: ${element.type} -->`;
       }
     };
 
-    const htmlContent = elements.map(renderElement).join('\n');
+    const getBootstrapClasses = (element: PageElement, baseClass: string = ''): string => {
+      const classes = [];
+      if (baseClass) classes.push(baseClass);
+      
+      // Add size classes
+      const sizeClass = getSizeBootstrapClass(element.properties.size);
+      if (sizeClass) classes.push(sizeClass);
+      
+      return classes.length > 0 ? ` class="${classes.join(' ')}"` : '';
+    };
+
+    const getInlineStyles = (element: PageElement, includeText: boolean = true): string => {
+      const styles = [];
+      
+      if (element.properties.backgroundColor && element.properties.backgroundColor !== 'transparent') {
+        styles.push(`background-color: ${element.properties.backgroundColor}`);
+      }
+      
+      if (includeText && element.properties.textColor) {
+        styles.push(`color: ${element.properties.textColor}`);
+      }
+      
+      return styles.length > 0 ? ` style="${styles.join('; ')}"` : '';
+    };
+
+    const getContainerStyles = (element: PageElement): string => {
+      const styles = [];
+      
+      if (element.properties.backgroundColor && element.properties.backgroundColor !== 'transparent') {
+        styles.push(`background-color: ${element.properties.backgroundColor}`);
+      }
+      
+      const styleAttr = styles.length > 0 ? ` style="${styles.join('; ')}"` : '';
+      return ` class="border border-secondary rounded p-3 mb-3"${styleAttr}`;
+    };
+
+    const htmlContent = elements.map(element => renderElement(element)).join('\n\n');
+    const currentDate = new Date().toLocaleDateString();
+    const currentTime = new Date().toLocaleTimeString();
 
     const fullHtml = `<!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Generated Page</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Generated page from ASPxone Builder">
+  <meta name="generator" content="ASPxone Builder">
+  <title>Generated Page</title>
+  
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  
+  <!-- Custom Styles -->
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      line-height: 1.6;
+    }
+    
+    .container {
+      max-width: 1200px;
+    }
+    
+    /* Custom utility classes */
+    .text-xs { font-size: 0.75rem; }
+    .text-sm { font-size: 0.875rem; }
+    .text-lg { font-size: 1.125rem; }
+    .text-xl { font-size: 1.25rem; }
+    .text-2xl { font-size: 1.5rem; }
+    .text-3xl { font-size: 1.875rem; }
+  </style>
 </head>
 <body>
-    <div class="container mt-4">
-        ${htmlContent}
-    </div>
+  <!-- Generated by ASPxone Builder on ${currentDate} at ${currentTime} -->
+  
+  <div class="container mt-4">
+${htmlContent}
+  </div>
+  
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>`;
 
@@ -232,6 +338,19 @@ function getSizeClass(size?: string): string {
     case '2XL': return 'text-2xl';
     case '3XL': return 'text-3xl';
     default: return 'text-base';
+  }
+}
+
+function getSizeBootstrapClass(size?: string): string {
+  switch (size) {
+    case 'XS': return 'fs-6';
+    case 'S': return 'fs-6';
+    case 'M': return 'fs-5';
+    case 'L': return 'fs-4';
+    case 'XL': return 'fs-3';
+    case '2XL': return 'fs-2';
+    case '3XL': return 'fs-1';
+    default: return '';
   }
 }
 

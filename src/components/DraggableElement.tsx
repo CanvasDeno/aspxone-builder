@@ -54,24 +54,28 @@ const DraggableElement: React.FC<DraggableElementProps> = ({
     
     const elementStyle = {
       backgroundColor: element.properties.backgroundColor === 'transparent' ? 'transparent' : element.properties.backgroundColor || 'transparent',
-      color: element.properties.textColor || 'inherit'
+      color: element.properties.textColor || 'inherit',
+      ...(element.properties.customCss ? parseCssString(element.properties.customCss) : {})
+    };
+
+    const elementProps = {
+      id: element.properties.elementId || undefined,
+      className: baseClass,
+      style: elementStyle
     };
 
     switch (element.type) {
       case 'heading':
         const HeadingTag = element.properties.level?.toLowerCase() as keyof JSX.IntrinsicElements || 'h1';
-        return React.createElement(HeadingTag, { 
-          className: baseClass,
-          style: elementStyle
-        }, element.content);
+        return React.createElement(HeadingTag, elementProps, element.content);
       case 'paragraph':
-        return <p className={baseClass} style={elementStyle}>{element.content}</p>;
+        return <p {...elementProps}>{element.content}</p>;
       case 'link':
         return (
           <a 
+            {...elementProps}
             href={element.properties.href || '#'} 
             className={`${baseClass} underline`}
-            style={elementStyle}
           >
             {element.content}
           </a>
@@ -79,17 +83,18 @@ const DraggableElement: React.FC<DraggableElementProps> = ({
       case 'button':
         return (
           <a 
+            {...elementProps}
             href={element.properties.href || '#'} 
             className={`${baseClass} px-4 py-2 rounded hover:opacity-80 inline-block`}
-            style={elementStyle}
           >
             {element.content}
           </a>
         );
       case 'image':
         return (
-          <div style={{ backgroundColor: elementStyle.backgroundColor }}>
+          <div style={{ backgroundColor: elementStyle.backgroundColor, ...parseCssString(element.properties.customCss || '') }}>
             <img 
+              id={element.properties.elementId || undefined}
               src={element.properties.src || 'https://via.placeholder.com/300x200'} 
               alt={element.properties.alt || ''} 
               className={`${baseClass} max-w-full h-auto`}
@@ -98,7 +103,7 @@ const DraggableElement: React.FC<DraggableElementProps> = ({
         );
       case 'audio':
         return (
-          <div className={`${baseClass} border border-gray-300 rounded p-3`} style={elementStyle}>
+          <div {...elementProps} className={`${baseClass} border border-gray-300 rounded p-3`}>
             <div className="text-sm font-semibold mb-2">{element.content}</div>
             <audio 
               src={element.properties.src || ''} 
@@ -114,7 +119,7 @@ const DraggableElement: React.FC<DraggableElementProps> = ({
         );
       case 'video':
         return (
-          <div className={`${baseClass} border border-gray-300 rounded p-3`} style={elementStyle}>
+          <div {...elementProps} className={`${baseClass} border border-gray-300 rounded p-3`}>
             <div className="text-sm font-semibold mb-2">{element.content}</div>
             <video 
               src={element.properties.src || ''} 
@@ -133,7 +138,7 @@ const DraggableElement: React.FC<DraggableElementProps> = ({
           ? `<% ${element.properties.code || ''} %>`
           : `@{\n${element.properties.code || ''}\n}`;
         return (
-          <div className={`${baseClass} border border-gray-300 rounded p-3`} style={elementStyle}>
+          <div {...elementProps} className={`${baseClass} border border-gray-300 rounded p-3`}>
             <div className="text-sm font-semibold mb-2">
               {element.content} ({element.properties.scriptingMode === 'mvc' ? 'MVC' : 'Razor'})
             </div>
@@ -147,7 +152,7 @@ const DraggableElement: React.FC<DraggableElementProps> = ({
           ? `<%\n${element.properties.code || ''}\n%>`
           : element.properties.code || '';
         return (
-          <div className={`${baseClass} border border-yellow-300 rounded p-3`} style={elementStyle}>
+          <div {...elementProps} className={`${baseClass} border border-yellow-300 rounded p-3`}>
             <div className="text-sm font-semibold mb-2">
               {element.content} ({element.properties.scriptingMode === 'mvc' ? 'MVC' : 'Razor'})
             </div>
@@ -157,7 +162,7 @@ const DraggableElement: React.FC<DraggableElementProps> = ({
           </div>
         );
       default:
-        return <div className={baseClass} style={elementStyle}>{element.content}</div>;
+        return <div {...elementProps}>{element.content}</div>;
     }
   };
 
@@ -185,6 +190,26 @@ function getSizeClass(size?: string): string {
     case '3XL': return 'text-3xl';
     default: return 'text-base';
   }
+}
+
+function parseCssString(cssString: string): React.CSSProperties {
+  const styles: React.CSSProperties = {};
+  if (!cssString) return styles;
+  
+  try {
+    const declarations = cssString.split(';').filter(decl => decl.trim());
+    declarations.forEach(declaration => {
+      const [property, value] = declaration.split(':').map(str => str.trim());
+      if (property && value) {
+        const camelCaseProperty = property.replace(/-([a-z])/g, (match, letter) => letter.toUpperCase());
+        (styles as any)[camelCaseProperty] = value;
+      }
+    });
+  } catch (error) {
+    console.warn('Error parsing CSS string:', error);
+  }
+  
+  return styles;
 }
 
 export default DraggableElement;

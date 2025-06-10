@@ -23,6 +23,8 @@ export interface PageElement {
     autoplay?: boolean;
     loop?: boolean;
     muted?: boolean;
+    elementId?: string;
+    customCss?: string;
     [key: string]: any;
   };
 }
@@ -77,32 +79,34 @@ const Index = () => {
     
     const renderElement = (element: PageElement, indentLevel: number = 3): string => {
       const baseIndent = indent(indentLevel);
+      const idAttr = element.properties.elementId ? ` id="${element.properties.elementId}"` : '';
+      const styleAttr = element.properties.customCss ? ` style="${element.properties.customCss}"` : '';
       
       switch (element.type) {
         case 'heading':
           const level = element.properties.level?.toLowerCase() || 'h1';
           const headingClasses = getBootstrapClasses(element);
           const headingStyles = getInlineStyles(element);
-          return `${baseIndent}<${level}${headingClasses}${headingStyles}>${element.content}</${level}>`;
+          return `${baseIndent}<${level}${idAttr}${headingClasses}${headingStyles}${styleAttr}>${element.content}</${level}>`;
         
         case 'paragraph':
           const paragraphClasses = getBootstrapClasses(element);
           const paragraphStyles = getInlineStyles(element);
-          return `${baseIndent}<p${paragraphClasses}${paragraphStyles}>${element.content}</p>`;
+          return `${baseIndent}<p${idAttr}${paragraphClasses}${paragraphStyles}${styleAttr}>${element.content}</p>`;
         
         case 'link':
           const linkClasses = getBootstrapClasses(element);
           const linkStyles = getInlineStyles(element);
-          return `${baseIndent}<a href="${element.properties.href || '#'}"${linkClasses}${linkStyles}>${element.content}</a>`;
+          return `${baseIndent}<a${idAttr} href="${element.properties.href || '#'}"${linkClasses}${linkStyles}${styleAttr}>${element.content}</a>`;
         
         case 'button':
           const buttonClasses = getBootstrapClasses(element, 'btn btn-primary');
           const buttonStyles = getInlineStyles(element);
-          return `${baseIndent}<a href="${element.properties.href || '#'}" class="btn btn-primary${buttonClasses.replace(' class="', '').replace('"', '')}"${buttonStyles}>${element.content}</a>`;
+          return `${baseIndent}<a${idAttr} href="${element.properties.href || '#'}" class="btn btn-primary${buttonClasses.replace(' class="', '').replace('"', '')}"${buttonStyles}${styleAttr}>${element.content}</a>`;
         
         case 'image':
           const imageStyles = getInlineStyles(element, false);
-          return `${baseIndent}<img src="${element.properties.src || ''}" alt="${element.properties.alt || ''}" class="img-fluid"${imageStyles} />`;
+          return `${baseIndent}<img${idAttr} src="${element.properties.src || ''}" alt="${element.properties.alt || ''}" class="img-fluid"${imageStyles}${styleAttr} />`;
         
         case 'audio':
           const audioAttrs = [
@@ -114,7 +118,7 @@ const Index = () => {
           const audioStyles = getInlineStyles(element, false);
           return `${baseIndent}<div${getContainerStyles(element)}>
 ${baseIndent}  <h6>${element.content}</h6>
-${baseIndent}  <audio src="${element.properties.src || ''}" ${audioAttrs}${audioStyles}>
+${baseIndent}  <audio${idAttr} src="${element.properties.src || ''}" ${audioAttrs}${audioStyles}${styleAttr}>
 ${baseIndent}    Your browser does not support the audio element.
 ${baseIndent}  </audio>
 ${baseIndent}</div>`;
@@ -129,7 +133,7 @@ ${baseIndent}</div>`;
           const videoStyles = getInlineStyles(element, false);
           return `${baseIndent}<div${getContainerStyles(element)}>
 ${baseIndent}  <h6>${element.content}</h6>
-${baseIndent}  <video src="${element.properties.src || ''}" ${videoAttrs} class="w-100"${videoStyles}>
+${baseIndent}  <video${idAttr} src="${element.properties.src || ''}" ${videoAttrs} class="w-100"${videoStyles}${styleAttr}>
 ${baseIndent}    Your browser does not support the video element.
 ${baseIndent}  </video>
 ${baseIndent}</div>`;
@@ -305,24 +309,28 @@ function getDefaultContent(type: PageElement['type']): string {
 
 function getDefaultProperties(type: PageElement['type']): PageElement['properties'] {
   switch (type) {
-    case 'heading': return { level: 'H1', size: 'XL', backgroundColor: 'transparent', textColor: '#000000' };
-    case 'paragraph': return { size: 'M', backgroundColor: 'transparent', textColor: '#000000' };
-    case 'link': return { size: 'M', href: '#', backgroundColor: 'transparent', textColor: '#2563eb' };
-    case 'button': return { size: 'M', href: '#', backgroundColor: '#2563eb', textColor: '#ffffff' };
-    case 'image': return { src: '', alt: '', backgroundColor: 'transparent' };
-    case 'audio': return { src: '', controls: true, autoplay: false, loop: false, muted: false, backgroundColor: 'transparent' };
-    case 'video': return { src: '', controls: true, autoplay: false, loop: false, muted: false, backgroundColor: 'transparent' };
+    case 'heading': return { level: 'H1', size: 'XL', backgroundColor: 'transparent', textColor: '#000000', elementId: '', customCss: '' };
+    case 'paragraph': return { size: 'M', backgroundColor: 'transparent', textColor: '#000000', elementId: '', customCss: '' };
+    case 'link': return { size: 'M', href: '#', backgroundColor: 'transparent', textColor: '#2563eb', elementId: '', customCss: '' };
+    case 'button': return { size: 'M', href: '#', backgroundColor: '#2563eb', textColor: '#ffffff', elementId: '', customCss: '' };
+    case 'image': return { src: '', alt: '', backgroundColor: 'transparent', elementId: '', customCss: '' };
+    case 'audio': return { src: '', controls: true, autoplay: false, loop: false, muted: false, backgroundColor: 'transparent', elementId: '', customCss: '' };
+    case 'video': return { src: '', controls: true, autoplay: false, loop: false, muted: false, backgroundColor: 'transparent', elementId: '', customCss: '' };
     case 'csharp': return { 
       code: '// Enter your C# code here\nstring message = "Hello World";',
       scriptingMode: 'razor',
       backgroundColor: '#f8f9fa',
-      textColor: '#212529'
+      textColor: '#212529',
+      elementId: '',
+      customCss: ''
     };
     case 'pagecode': return { 
       code: '// Enter your C# page code here\nstring pageTitle = "My Page";',
       scriptingMode: 'razor',
       backgroundColor: '#fff3cd',
-      textColor: '#856404'
+      textColor: '#856404',
+      elementId: '',
+      customCss: ''
     };
     default: return {};
   }
@@ -355,3 +363,5 @@ function getSizeBootstrapClass(size?: string): string {
 }
 
 export default Index;
+
+}

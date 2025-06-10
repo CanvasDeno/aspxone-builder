@@ -287,6 +287,16 @@ const ElementEditor: React.FC<ElementEditorProps> = ({
           />
         </div>
 
+        <div className="space-y-2">
+          <Label htmlFor="elementId">Element ID</Label>
+          <Input
+            id="elementId"
+            value={editedElement.properties.elementId || ''}
+            onChange={(e) => handlePropertyChange('elementId', e.target.value)}
+            placeholder="my-element-id"
+          />
+        </div>
+
         {editedElement.type !== 'image' && editedElement.type !== 'csharp' && editedElement.type !== 'pagecode' && editedElement.type !== 'audio' && editedElement.type !== 'video' && (
           <div className="space-y-2">
             <Label htmlFor="size">Size (approx)</Label>
@@ -312,6 +322,17 @@ const ElementEditor: React.FC<ElementEditorProps> = ({
         <div className="border-t pt-4">
           <Label className="text-sm font-medium mb-2 block">Colors</Label>
           {renderColorFields()}
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="customCss">Custom CSS</Label>
+          <Textarea
+            id="customCss"
+            value={editedElement.properties.customCss || ''}
+            onChange={(e) => handlePropertyChange('customCss', e.target.value)}
+            placeholder="margin: 10px; padding: 5px; border: 1px solid #ccc;"
+            className="min-h-[80px] font-mono text-sm"
+          />
         </div>
 
         <div className="pt-4 space-y-2">

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -195,13 +194,16 @@ const ElementEditor: React.FC<ElementEditorProps> = ({
             <div className="space-y-2">
               <Label htmlFor="scriptingMode">Scripting Mode</Label>
               <Select 
-                value={editedElement.properties.scriptingMode || 'razor'} 
+                value={editedElement.properties.scriptingMode || (editedElement.type === 'pagecode' ? 'javascript' : 'razor')} 
                 onValueChange={(value) => handlePropertyChange('scriptingMode', value)}
               >
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
+                  {editedElement.type === 'pagecode' && (
+                    <SelectItem value="javascript">JavaScript</SelectItem>
+                  )}
                   <SelectItem value="razor">ASP.NET Razor</SelectItem>
                   <SelectItem value="mvc">ASP.NET MVC</SelectItem>
                 </SelectContent>
@@ -209,13 +211,19 @@ const ElementEditor: React.FC<ElementEditorProps> = ({
             </div>
             <div className="space-y-2">
               <Label htmlFor="code">
-                {editedElement.type === 'csharp' ? 'C# Code Block' : 'C# Page Code'}
+                {editedElement.type === 'csharp' ? 'C# Code Block' : 
+                 editedElement.properties.scriptingMode === 'javascript' ? 'JavaScript Code' :
+                 'C# Page Code'}
               </Label>
               <Textarea
                 id="code"
                 value={editedElement.properties.code || ''}
                 onChange={(e) => handlePropertyChange('code', e.target.value)}
-                placeholder="Enter your C# code here..."
+                placeholder={
+                  editedElement.properties.scriptingMode === 'javascript' 
+                    ? 'Enter your JavaScript code here...'
+                    : 'Enter your C# code here...'
+                }
                 className="min-h-[200px] font-mono text-sm"
               />
             </div>

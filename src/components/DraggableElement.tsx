@@ -1,4 +1,3 @@
-
 import React, { useRef } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 import { PageElement } from '@/pages/Index';
@@ -148,13 +147,22 @@ const DraggableElement: React.FC<DraggableElementProps> = ({
           </div>
         );
       case 'pagecode':
-        const pageCode = element.properties.scriptingMode === 'mvc'
-          ? `<%\n${element.properties.code || ''}\n%>`
-          : element.properties.code || '';
+        let pageCode;
+        let modeLabel;
+        if (element.properties.scriptingMode === 'javascript') {
+          pageCode = element.properties.code || '';
+          modeLabel = 'JavaScript';
+        } else if (element.properties.scriptingMode === 'mvc') {
+          pageCode = `<%\n${element.properties.code || ''}\n%>`;
+          modeLabel = 'MVC';
+        } else {
+          pageCode = element.properties.code || '';
+          modeLabel = 'Razor';
+        }
         return (
           <div {...elementProps} className={`${baseClass} border border-yellow-300 rounded p-3`}>
             <div className="text-sm font-semibold mb-2">
-              {element.content} ({element.properties.scriptingMode === 'mvc' ? 'MVC' : 'Razor'})
+              {element.content} ({modeLabel})
             </div>
             <pre className="text-xs font-mono p-2 rounded overflow-auto" style={{ backgroundColor: 'rgba(0,0,0,0.05)' }}>
               {pageCode}

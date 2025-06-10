@@ -1,4 +1,3 @@
-
 import React, { useState, useCallback } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
@@ -17,7 +16,7 @@ export interface PageElement {
     src?: string;
     alt?: string;
     code?: string;
-    scriptingMode?: 'razor' | 'mvc';
+    scriptingMode?: 'razor' | 'mvc' | 'javascript';
     backgroundColor?: string;
     textColor?: string;
     controls?: boolean;
@@ -147,10 +146,17 @@ ${baseIndent}</div>`;
 ${baseIndent}${csharpCode}`;
         
         case 'pagecode':
-          const pageCode = element.properties.scriptingMode === 'mvc'
-            ? `<%\n    ${element.properties.code?.replace(/\n/g, '\n    ') || ''}\n%>`
-            : element.properties.code || '';
-          return `${baseIndent}<!-- ${element.content} (${element.properties.scriptingMode === 'mvc' ? 'MVC' : 'Razor'}) -->
+          let pageCode;
+          if (element.properties.scriptingMode === 'javascript') {
+            pageCode = `<script>
+    ${element.properties.code?.replace(/\n/g, '\n    ') || ''}
+</script>`;
+          } else if (element.properties.scriptingMode === 'mvc') {
+            pageCode = `<%\n    ${element.properties.code?.replace(/\n/g, '\n    ') || ''}\n%>`;
+          } else {
+            pageCode = element.properties.code || '';
+          }
+          return `${baseIndent}<!-- ${element.content} (${element.properties.scriptingMode === 'mvc' ? 'MVC' : element.properties.scriptingMode === 'javascript' ? 'JavaScript' : 'Razor'}) -->
 ${baseIndent}${pageCode}`;
         
         default:
@@ -303,7 +309,7 @@ function getDefaultContent(type: PageElement['type']): string {
     case 'audio': return 'Audio Player';
     case 'video': return 'Video Player';
     case 'csharp': return 'C# Code Block';
-    case 'pagecode': return 'C# Page Code';
+    case 'pagecode': return 'Page Code';
     default: return '';
   }
 }
@@ -326,8 +332,8 @@ function getDefaultProperties(type: PageElement['type']): PageElement['propertie
       customCss: ''
     };
     case 'pagecode': return { 
-      code: '// Enter your C# page code here\nstring pageTitle = "My Page";',
-      scriptingMode: 'razor',
+      code: '// Enter your page code here\nconsole.log("Hello World");',
+      scriptingMode: 'javascript',
       backgroundColor: '#fff3cd',
       textColor: '#856404',
       elementId: '',

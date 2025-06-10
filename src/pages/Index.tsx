@@ -77,6 +77,16 @@ const Index = () => {
   const exportAsHtml = useCallback(() => {
     const indent = (level: number) => '  '.repeat(level);
     
+    // Helper function to convert markdown to HTML
+    const convertMarkdownToHtml = (text: string): string => {
+      return text
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*(.*?)\*/g, '<em>$1</em>')
+        .replace(/`(.*?)`/g, '<code>$1</code>')
+        .replace(/~~(.*?)~~/g, '<del>$1</del>')
+        .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2">$1</a>');
+    };
+    
     const renderElement = (element: PageElement, indentLevel: number = 3): string => {
       const baseIndent = indent(indentLevel);
       const idAttr = element.properties.elementId ? ` id="${element.properties.elementId}"` : '';
@@ -87,22 +97,26 @@ const Index = () => {
           const level = element.properties.level?.toLowerCase() || 'h1';
           const headingClasses = getBootstrapClasses(element);
           const headingStyles = getInlineStyles(element);
-          return `${baseIndent}<${level}${idAttr}${headingClasses}${headingStyles}${styleAttr}>${element.content}</${level}>`;
+          const headingContent = convertMarkdownToHtml(element.content);
+          return `${baseIndent}<${level}${idAttr}${headingClasses}${headingStyles}${styleAttr}>${headingContent}</${level}>`;
         
         case 'paragraph':
           const paragraphClasses = getBootstrapClasses(element);
           const paragraphStyles = getInlineStyles(element);
-          return `${baseIndent}<p${idAttr}${paragraphClasses}${paragraphStyles}${styleAttr}>${element.content}</p>`;
+          const paragraphContent = convertMarkdownToHtml(element.content);
+          return `${baseIndent}<p${idAttr}${paragraphClasses}${paragraphStyles}${styleAttr}>${paragraphContent}</p>`;
         
         case 'link':
           const linkClasses = getBootstrapClasses(element);
           const linkStyles = getInlineStyles(element);
-          return `${baseIndent}<a${idAttr} href="${element.properties.href || '#'}"${linkClasses}${linkStyles}${styleAttr}>${element.content}</a>`;
+          const linkContent = convertMarkdownToHtml(element.content);
+          return `${baseIndent}<a${idAttr} href="${element.properties.href || '#'}"${linkClasses}${linkStyles}${styleAttr}>${linkContent}</a>`;
         
         case 'button':
           const buttonClasses = getBootstrapClasses(element, 'btn btn-primary');
           const buttonStyles = getInlineStyles(element);
-          return `${baseIndent}<a${idAttr} href="${element.properties.href || '#'}" class="btn btn-primary${buttonClasses.replace(' class="', '').replace('"', '')}"${buttonStyles}${styleAttr}>${element.content}</a>`;
+          const buttonContent = convertMarkdownToHtml(element.content);
+          return `${baseIndent}<a${idAttr} href="${element.properties.href || '#'}" class="btn btn-primary${buttonClasses.replace(' class="', '').replace('"', '')}"${buttonStyles}${styleAttr}>${buttonContent}</a>`;
         
         case 'image':
           const imageStyles = getInlineStyles(element, false);

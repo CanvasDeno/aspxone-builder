@@ -1,5 +1,7 @@
+
 import React, { useRef } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
+import ReactMarkdown from 'react-markdown';
 import { PageElement } from '@/pages/Index';
 
 interface DraggableElementProps {
@@ -66,9 +68,19 @@ const DraggableElement: React.FC<DraggableElementProps> = ({
     switch (element.type) {
       case 'heading':
         const HeadingTag = element.properties.level?.toLowerCase() as keyof JSX.IntrinsicElements || 'h1';
-        return React.createElement(HeadingTag, elementProps, element.content);
+        return React.createElement(HeadingTag, elementProps, 
+          <ReactMarkdown components={{ p: ({ children }) => <>{children}</> }}>
+            {element.content}
+          </ReactMarkdown>
+        );
       case 'paragraph':
-        return <p {...elementProps}>{element.content}</p>;
+        return (
+          <div {...elementProps}>
+            <ReactMarkdown components={{ p: ({ children }) => <>{children}</> }}>
+              {element.content}
+            </ReactMarkdown>
+          </div>
+        );
       case 'link':
         return (
           <a 
@@ -76,7 +88,9 @@ const DraggableElement: React.FC<DraggableElementProps> = ({
             href={element.properties.href || '#'} 
             className={`${baseClass} underline`}
           >
-            {element.content}
+            <ReactMarkdown components={{ p: ({ children }) => <>{children}</> }}>
+              {element.content}
+            </ReactMarkdown>
           </a>
         );
       case 'button':
@@ -86,7 +100,9 @@ const DraggableElement: React.FC<DraggableElementProps> = ({
             href={element.properties.href || '#'} 
             className={`${baseClass} px-4 py-2 rounded hover:opacity-80 inline-block`}
           >
-            {element.content}
+            <ReactMarkdown components={{ p: ({ children }) => <>{children}</> }}>
+              {element.content}
+            </ReactMarkdown>
           </a>
         );
       case 'image':

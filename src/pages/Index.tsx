@@ -90,37 +90,44 @@ const Index = () => {
     const renderElement = (element: PageElement, indentLevel: number = 3): string => {
       const baseIndent = indent(indentLevel);
       const idAttr = element.properties.elementId ? ` id="${element.properties.elementId}"` : '';
-      const styleAttr = element.properties.customCss ? ` style="${element.properties.customCss}"` : '';
+      
+      // Build style attribute
+      const styles = [];
+      if (element.properties.backgroundColor && element.properties.backgroundColor !== 'transparent') {
+        styles.push(`background-color: ${element.properties.backgroundColor}`);
+      }
+      if (element.properties.textColor) {
+        styles.push(`color: ${element.properties.textColor}`);
+      }
+      if (element.properties.customCss) {
+        styles.push(element.properties.customCss);
+      }
+      const styleAttr = styles.length > 0 ? ` style="${styles.join('; ')}"` : '';
       
       switch (element.type) {
         case 'heading':
           const level = element.properties.level?.toLowerCase() || 'h1';
           const headingClasses = getBootstrapClasses(element);
-          const headingStyles = getInlineStyles(element);
           const headingContent = convertMarkdownToHtml(element.content);
-          return `${baseIndent}<${level}${idAttr}${headingClasses}${headingStyles}${styleAttr}>${headingContent}</${level}>`;
+          return `${baseIndent}<${level}${idAttr}${headingClasses}${styleAttr}>${headingContent}</${level}>`;
         
         case 'paragraph':
           const paragraphClasses = getBootstrapClasses(element);
-          const paragraphStyles = getInlineStyles(element);
           const paragraphContent = convertMarkdownToHtml(element.content);
-          return `${baseIndent}<p${idAttr}${paragraphClasses}${paragraphStyles}${styleAttr}>${paragraphContent}</p>`;
+          return `${baseIndent}<p${idAttr}${paragraphClasses}${styleAttr}>${paragraphContent}</p>`;
         
         case 'link':
           const linkClasses = getBootstrapClasses(element);
-          const linkStyles = getInlineStyles(element);
           const linkContent = convertMarkdownToHtml(element.content);
-          return `${baseIndent}<a${idAttr} href="${element.properties.href || '#'}"${linkClasses}${linkStyles}${styleAttr}>${linkContent}</a>`;
+          return `${baseIndent}<a${idAttr} href="${element.properties.href || '#'}"${linkClasses}${styleAttr}>${linkContent}</a>`;
         
         case 'button':
-          const buttonClasses = getBootstrapClasses(element, 'btn btn-primary');
-          const buttonStyles = getInlineStyles(element);
           const buttonContent = convertMarkdownToHtml(element.content);
-          return `${baseIndent}<a${idAttr} href="${element.properties.href || '#'}" class="btn btn-primary${buttonClasses.replace(' class="', '').replace('"', '')}"${buttonStyles}${styleAttr}>${buttonContent}</a>`;
+          const buttonStyles = styles.length > 0 ? ` style="${styles.join('; ')}"` : '';
+          return `${baseIndent}<a${idAttr} href="${element.properties.href || '#'}" class="btn btn-primary"${buttonStyles}>${buttonContent}</a>`;
         
         case 'image':
-          const imageStyles = getInlineStyles(element, false);
-          return `${baseIndent}<img${idAttr} src="${element.properties.src || ''}" alt="${element.properties.alt || ''}" class="img-fluid"${imageStyles}${styleAttr} />`;
+          return `${baseIndent}<img${idAttr} src="${element.properties.src || ''}" alt="${element.properties.alt || ''}" class="img-fluid"${styleAttr} />`;
         
         case 'audio':
           const audioAttrs = [
@@ -129,10 +136,9 @@ const Index = () => {
             element.properties.loop ? 'loop' : '',
             element.properties.muted ? 'muted' : ''
           ].filter(Boolean).join(' ');
-          const audioStyles = getInlineStyles(element, false);
-          return `${baseIndent}<div${getContainerStyles(element)}>
+          return `${baseIndent}<div class="border border-secondary rounded p-3 mb-3"${styleAttr}>
 ${baseIndent}  <h6>${element.content}</h6>
-${baseIndent}  <audio${idAttr} src="${element.properties.src || ''}" ${audioAttrs}${audioStyles}${styleAttr}>
+${baseIndent}  <audio${idAttr} src="${element.properties.src || ''}" ${audioAttrs} class="w-100">
 ${baseIndent}    Your browser does not support the audio element.
 ${baseIndent}  </audio>
 ${baseIndent}</div>`;
@@ -144,10 +150,9 @@ ${baseIndent}</div>`;
             element.properties.loop ? 'loop' : '',
             element.properties.muted ? 'muted' : ''
           ].filter(Boolean).join(' ');
-          const videoStyles = getInlineStyles(element, false);
-          return `${baseIndent}<div${getContainerStyles(element)}>
+          return `${baseIndent}<div class="border border-secondary rounded p-3 mb-3"${styleAttr}>
 ${baseIndent}  <h6>${element.content}</h6>
-${baseIndent}  <video${idAttr} src="${element.properties.src || ''}" ${videoAttrs} class="w-100"${videoStyles}${styleAttr}>
+${baseIndent}  <video${idAttr} src="${element.properties.src || ''}" ${videoAttrs} class="w-100">
 ${baseIndent}    Your browser does not support the video element.
 ${baseIndent}  </video>
 ${baseIndent}</div>`;
@@ -178,40 +183,14 @@ ${baseIndent}${pageCode}`;
       }
     };
 
-    const getBootstrapClasses = (element: PageElement, baseClass: string = ''): string => {
+    const getBootstrapClasses = (element: PageElement): string => {
       const classes = [];
-      if (baseClass) classes.push(baseClass);
       
       // Add size classes
       const sizeClass = getSizeBootstrapClass(element.properties.size);
       if (sizeClass) classes.push(sizeClass);
       
       return classes.length > 0 ? ` class="${classes.join(' ')}"` : '';
-    };
-
-    const getInlineStyles = (element: PageElement, includeText: boolean = true): string => {
-      const styles = [];
-      
-      if (element.properties.backgroundColor && element.properties.backgroundColor !== 'transparent') {
-        styles.push(`background-color: ${element.properties.backgroundColor}`);
-      }
-      
-      if (includeText && element.properties.textColor) {
-        styles.push(`color: ${element.properties.textColor}`);
-      }
-      
-      return styles.length > 0 ? ` style="${styles.join('; ')}"` : '';
-    };
-
-    const getContainerStyles = (element: PageElement): string => {
-      const styles = [];
-      
-      if (element.properties.backgroundColor && element.properties.backgroundColor !== 'transparent') {
-        styles.push(`background-color: ${element.properties.backgroundColor}`);
-      }
-      
-      const styleAttr = styles.length > 0 ? ` style="${styles.join('; ')}"` : '';
-      return ` class="border border-secondary rounded p-3 mb-3"${styleAttr}`;
     };
 
     const htmlContent = elements.map(element => renderElement(element)).join('\n\n');

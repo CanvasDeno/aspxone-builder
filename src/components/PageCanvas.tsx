@@ -40,7 +40,7 @@ const PageCanvas: React.FC<PageCanvasProps> = ({
         <ScrollArea className="h-full">
           <div
             ref={drop}
-            className={`min-h-[500px] p-4 border-2 border-dashed rounded-lg transition-colors mx-4 my-4 ${
+            className={`min-h-[500px] p-4 border-2 border-dashed rounded-lg transition-colors mx-4 my-4 flex flex-col ${
               isOver ? 'border-blue-400 bg-blue-50' : 'border-gray-300'
             }`}
           >
@@ -49,7 +49,7 @@ const PageCanvas: React.FC<PageCanvasProps> = ({
                 <p>Drag elements here or click "Add" buttons to start building your page</p>
               </div>
             ) : (
-              <div className="space-y-4">
+              <div className="space-y-4 flex-1 flex flex-col">
                 {elements.map((element, index) => (
                   <DraggableElement
                     key={element.id}

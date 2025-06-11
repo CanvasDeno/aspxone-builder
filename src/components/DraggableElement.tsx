@@ -123,8 +123,10 @@ const DraggableElement: React.FC<DraggableElementProps> = ({
               <div className="text-lg font-semibold">{element.content}</div>
               <div className="flex space-x-4">
                 {navItems.map((item: any, index: number) => (
-                  <a key={index} href={item.href || '#'} className="text-sm hover:underline">
-                    {item.icon && <span className="mr-1">{item.icon}</span>}
+                  <a key={index} href={item.href || '#'} className="text-sm hover:underline flex items-center gap-1">
+                    {item.icon && (
+                      <span className="text-sm" dangerouslySetInnerHTML={{ __html: item.icon }} />
+                    )}
                     {item.text}
                   </a>
                 ))}
@@ -134,7 +136,7 @@ const DraggableElement: React.FC<DraggableElementProps> = ({
         );
       case 'footer':
         return (
-          <footer {...elementProps} className={`${baseClass} border border-gray-300 rounded p-3 text-center`}>
+          <footer {...elementProps} className={`${baseClass} border border-gray-300 rounded p-3 text-center mt-auto`}>
             <ReactMarkdown components={{ p: ({ children }) => <>{children}</> }}>
               {element.properties.footerText || element.content}
             </ReactMarkdown>

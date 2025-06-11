@@ -7,7 +7,7 @@ import ElementEditor from '@/components/ElementEditor';
 
 export interface PageElement {
   id: string;
-  type: 'heading' | 'paragraph' | 'link' | 'button' | 'image' | 'csharp' | 'pagecode' | 'audio' | 'video';
+  type: 'heading' | 'paragraph' | 'link' | 'button' | 'image' | 'csharp' | 'pagecode' | 'audio' | 'video' | 'navbar' | 'footer' | 'textbox';
   content: string;
   properties: {
     level?: string;
@@ -25,6 +25,10 @@ export interface PageElement {
     muted?: boolean;
     elementId?: string;
     customCss?: string;
+    navItems?: Array<{ text: string; icon?: string; href: string }>;
+    footerText?: string;
+    placeholder?: string;
+    inputType?: string;
     [key: string]: any;
   };
 }
@@ -128,6 +132,38 @@ const Index = () => {
         
         case 'image':
           return `${baseIndent}<img${idAttr} src="${element.properties.src || ''}" alt="${element.properties.alt || ''}" class="img-fluid"${styleAttr} />`;
+        
+        case 'textbox':
+          const inputType = element.properties.inputType || 'text';
+          const placeholder = element.properties.placeholder || '';
+          return `${baseIndent}<input${idAttr} type="${inputType}" placeholder="${placeholder}" class="form-control"${styleAttr} />`;
+        
+        case 'navbar':
+          const navItems = element.properties.navItems || [];
+          const navItemsHtml = navItems.map((item: any) => 
+            `${baseIndent}    <li class="nav-item">
+${baseIndent}      <a class="nav-link" href="${item.href || '#'}">
+${baseIndent}        ${item.icon ? `<i class="${item.icon}"></i> ` : ''}${item.text}
+${baseIndent}      </a>
+${baseIndent}    </li>`
+          ).join('\n');
+          
+          return `${baseIndent}<nav${idAttr} class="navbar navbar-expand-lg navbar-light bg-light"${styleAttr}>
+${baseIndent}  <div class="container">
+${baseIndent}    <a class="navbar-brand" href="#">${element.content}</a>
+${baseIndent}    <div class="navbar-nav">
+${navItemsHtml}
+${baseIndent}    </div>
+${baseIndent}  </div>
+${baseIndent}</nav>`;
+        
+        case 'footer':
+          const footerText = element.properties.footerText || element.content;
+          return `${baseIndent}<footer${idAttr} class="bg-light text-center py-3"${styleAttr}>
+${baseIndent}  <div class="container">
+${baseIndent}    <p class="mb-0">${convertMarkdownToHtml(footerText)}</p>
+${baseIndent}  </div>
+${baseIndent}</footer>`;
         
         case 'audio':
           const audioAttrs = [
@@ -303,6 +339,9 @@ function getDefaultContent(type: PageElement['type']): string {
     case 'video': return 'Video Player';
     case 'csharp': return 'C# Code Block';
     case 'pagecode': return 'Page Code';
+    case 'navbar': return 'My Website';
+    case 'footer': return '© 2023 My Website. All rights reserved.';
+    case 'textbox': return 'Text Input';
     default: return '';
   }
 }
@@ -329,6 +368,32 @@ function getDefaultProperties(type: PageElement['type']): PageElement['propertie
       scriptingMode: 'javascript',
       backgroundColor: '#fff3cd',
       textColor: '#856404',
+      elementId: '',
+      customCss: ''
+    };
+    case 'navbar': return {
+      navItems: [
+        { text: 'Home', href: '#' },
+        { text: 'About', href: '#about' },
+        { text: 'Contact', href: '#contact' }
+      ],
+      backgroundColor: '#f8f9fa',
+      textColor: '#212529',
+      elementId: '',
+      customCss: ''
+    };
+    case 'footer': return {
+      footerText: '© 2023 My Website. All rights reserved.',
+      backgroundColor: '#f8f9fa',
+      textColor: '#6c757d',
+      elementId: '',
+      customCss: ''
+    };
+    case 'textbox': return {
+      placeholder: 'Enter text...',
+      inputType: 'text',
+      backgroundColor: 'transparent',
+      textColor: '#000000',
       elementId: '',
       customCss: ''
     };

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -58,6 +59,24 @@ const ElementEditor: React.FC<ElementEditorProps> = ({
     } : null);
   };
 
+  const handleNavItemChange = (index: number, field: string, value: string) => {
+    const navItems = [...(editedElement.properties.navItems || [])];
+    navItems[index] = { ...navItems[index], [field]: value };
+    handlePropertyChange('navItems', navItems);
+  };
+
+  const addNavItem = () => {
+    const navItems = [...(editedElement.properties.navItems || [])];
+    navItems.push({ text: 'New Item', href: '#' });
+    handlePropertyChange('navItems', navItems);
+  };
+
+  const removeNavItem = (index: number) => {
+    const navItems = [...(editedElement.properties.navItems || [])];
+    navItems.splice(index, 1);
+    handlePropertyChange('navItems', navItems);
+  };
+
   const handleSave = () => {
     if (editedElement) {
       onUpdateElement(editedElement);
@@ -112,6 +131,80 @@ const ElementEditor: React.FC<ElementEditorProps> = ({
               value={editedElement.properties.href || ''}
               onChange={(e) => handlePropertyChange('href', e.target.value)}
               placeholder="https://example.com"
+            />
+          </div>
+        );
+      case 'textbox':
+        return (
+          <>
+            <div className="space-y-2">
+              <Label htmlFor="placeholder">Placeholder Text</Label>
+              <Input
+                id="placeholder"
+                value={editedElement.properties.placeholder || ''}
+                onChange={(e) => handlePropertyChange('placeholder', e.target.value)}
+                placeholder="Enter placeholder text..."
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="inputType">Input Type</Label>
+              <Select value={editedElement.properties.inputType || 'text'} onValueChange={(value) => handlePropertyChange('inputType', value)}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="text">Text</SelectItem>
+                  <SelectItem value="email">Email</SelectItem>
+                  <SelectItem value="password">Password</SelectItem>
+                  <SelectItem value="number">Number</SelectItem>
+                  <SelectItem value="tel">Phone</SelectItem>
+                  <SelectItem value="url">URL</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </>
+        );
+      case 'navbar':
+        return (
+          <div className="space-y-4">
+            <Label>Navigation Items</Label>
+            {(editedElement.properties.navItems || []).map((item: any, index: number) => (
+              <div key={index} className="border border-gray-200 rounded p-3 space-y-2">
+                <Input
+                  value={item.text || ''}
+                  onChange={(e) => handleNavItemChange(index, 'text', e.target.value)}
+                  placeholder="Menu text"
+                />
+                <Input
+                  value={item.href || ''}
+                  onChange={(e) => handleNavItemChange(index, 'href', e.target.value)}
+                  placeholder="Link URL"
+                />
+                <Input
+                  value={item.icon || ''}
+                  onChange={(e) => handleNavItemChange(index, 'icon', e.target.value)}
+                  placeholder="Icon class (optional)"
+                />
+                <Button onClick={() => removeNavItem(index)} variant="destructive" size="sm">
+                  Remove
+                </Button>
+              </div>
+            ))}
+            <Button onClick={addNavItem} variant="outline" className="w-full">
+              Add Navigation Item
+            </Button>
+          </div>
+        );
+      case 'footer':
+        return (
+          <div className="space-y-2">
+            <Label htmlFor="footerText">Footer Text</Label>
+            <Textarea
+              id="footerText"
+              value={editedElement.properties.footerText || ''}
+              onChange={(e) => handlePropertyChange('footerText', e.target.value)}
+              placeholder="Footer content..."
+              className="min-h-[80px]"
             />
           </div>
         );
@@ -285,7 +378,10 @@ const ElementEditor: React.FC<ElementEditorProps> = ({
              editedElement.type === 'csharp' ? 'Code Block Description' : 
              editedElement.type === 'pagecode' ? 'Page Code Description' :
              editedElement.type === 'audio' ? 'Audio Description' :
-             editedElement.type === 'video' ? 'Video Description' : 'Text'}
+             editedElement.type === 'video' ? 'Video Description' :
+             editedElement.type === 'navbar' ? 'Site/Brand Name' :
+             editedElement.type === 'footer' ? 'Footer Title' :
+             editedElement.type === 'textbox' ? 'Input Label' : 'Text'}
           </Label>
           <Input
             id="content"
@@ -305,7 +401,7 @@ const ElementEditor: React.FC<ElementEditorProps> = ({
           />
         </div>
 
-        {editedElement.type !== 'image' && editedElement.type !== 'csharp' && editedElement.type !== 'pagecode' && editedElement.type !== 'audio' && editedElement.type !== 'video' && (
+        {editedElement.type !== 'image' && editedElement.type !== 'csharp' && editedElement.type !== 'pagecode' && editedElement.type !== 'audio' && editedElement.type !== 'video' && editedElement.type !== 'navbar' && editedElement.type !== 'footer' && editedElement.type !== 'textbox' && (
           <div className="space-y-2">
             <Label htmlFor="size">Size (approx)</Label>
             <Select value={editedElement.properties.size} onValueChange={(value) => handlePropertyChange('size', value)}>

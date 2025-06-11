@@ -2,10 +2,10 @@ import React from 'react';
 import { useDrag } from 'react-dnd';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Type, FileText, Link, Square, Image, Code, FileCode, AudioLines, Video } from 'lucide-react';
+import { Type, FileText, Link, Square, Image, Code, FileCode, AudioLines, Video, Navigation, MapPin, Input } from 'lucide-react';
 
 interface ElementToolboxProps {
-  onAddElement: (type: 'heading' | 'paragraph' | 'link' | 'button' | 'image' | 'csharp' | 'pagecode' | 'audio' | 'video') => void;
+  onAddElement: (type: 'heading' | 'paragraph' | 'link' | 'button' | 'image' | 'csharp' | 'pagecode' | 'audio' | 'video' | 'navbar' | 'footer' | 'textbox') => void;
   onExport: () => void;
 }
 
@@ -15,7 +15,10 @@ const ElementToolbox: React.FC<ElementToolboxProps> = ({ onAddElement, onExport 
     { type: 'paragraph' as const, label: 'Add Paragraph', icon: FileText },
     { type: 'link' as const, label: 'Add Link', icon: Link },
     { type: 'button' as const, label: 'Add Button', icon: Square },
+    { type: 'textbox' as const, label: 'Add Textbox', icon: Input },
     { type: 'image' as const, label: 'Add Image', icon: Image },
+    { type: 'navbar' as const, label: 'Add Navigation', icon: Navigation },
+    { type: 'footer' as const, label: 'Add Footer', icon: MapPin },
     { type: 'audio' as const, label: 'Add Audio', icon: AudioLines },
     { type: 'video' as const, label: 'Add Video', icon: Video },
     { type: 'pagecode' as const, label: 'Add Page Code', icon: FileCode },

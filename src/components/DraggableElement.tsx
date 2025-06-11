@@ -1,4 +1,3 @@
-
 import React, { useRef } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 import ReactMarkdown from 'react-markdown';
@@ -104,6 +103,42 @@ const DraggableElement: React.FC<DraggableElementProps> = ({
               {element.content}
             </ReactMarkdown>
           </a>
+        );
+      case 'textbox':
+        return (
+          <div {...elementProps} className={`${baseClass} border border-gray-300 rounded p-3`}>
+            <div className="text-sm font-semibold mb-2">{element.content}</div>
+            <input 
+              type={element.properties.inputType || 'text'}
+              placeholder={element.properties.placeholder || ''}
+              className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+        );
+      case 'navbar':
+        const navItems = element.properties.navItems || [];
+        return (
+          <nav {...elementProps} className={`${baseClass} border border-gray-300 rounded p-3`}>
+            <div className="flex items-center justify-between">
+              <div className="text-lg font-semibold">{element.content}</div>
+              <div className="flex space-x-4">
+                {navItems.map((item: any, index: number) => (
+                  <a key={index} href={item.href || '#'} className="text-sm hover:underline">
+                    {item.icon && <span className="mr-1">{item.icon}</span>}
+                    {item.text}
+                  </a>
+                ))}
+              </div>
+            </div>
+          </nav>
+        );
+      case 'footer':
+        return (
+          <footer {...elementProps} className={`${baseClass} border border-gray-300 rounded p-3 text-center`}>
+            <ReactMarkdown components={{ p: ({ children }) => <>{children}</> }}>
+              {element.properties.footerText || element.content}
+            </ReactMarkdown>
+          </footer>
         );
       case 'image':
         return (

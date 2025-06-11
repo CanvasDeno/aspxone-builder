@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -59,22 +58,29 @@ const ElementEditor: React.FC<ElementEditorProps> = ({
     } : null);
   };
 
+  const handleNavItemsChange = (navItems: Array<{ text: string; icon?: string; href: string }>) => {
+    setEditedElement(prev => prev ? {
+      ...prev,
+      properties: { ...prev.properties, navItems }
+    } : null);
+  };
+
   const handleNavItemChange = (index: number, field: string, value: string) => {
     const navItems = [...(editedElement.properties.navItems || [])];
     navItems[index] = { ...navItems[index], [field]: value };
-    handlePropertyChange('navItems', navItems);
+    handleNavItemsChange(navItems);
   };
 
   const addNavItem = () => {
     const navItems = [...(editedElement.properties.navItems || [])];
     navItems.push({ text: 'New Item', href: '#' });
-    handlePropertyChange('navItems', navItems);
+    handleNavItemsChange(navItems);
   };
 
   const removeNavItem = (index: number) => {
     const navItems = [...(editedElement.properties.navItems || [])];
     navItems.splice(index, 1);
-    handlePropertyChange('navItems', navItems);
+    handleNavItemsChange(navItems);
   };
 
   const handleSave = () => {

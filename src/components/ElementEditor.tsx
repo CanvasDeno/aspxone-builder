@@ -305,6 +305,7 @@ const ElementEditor: React.FC<ElementEditorProps> = ({
                   )}
                   <SelectItem value="razor">ASP.NET Razor</SelectItem>
                   <SelectItem value="mvc">ASP.NET MVC</SelectItem>
+                  <SelectItem value="vbnet">VB.NET</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -312,6 +313,7 @@ const ElementEditor: React.FC<ElementEditorProps> = ({
               <Label htmlFor="code">
                 {editedElement.type === 'csharp' ? 'C# Code Block' : 
                  editedElement.properties.scriptingMode === 'javascript' ? 'JavaScript Code' :
+                 editedElement.properties.scriptingMode === 'vbnet' ? 'VB.NET Code' :
                  'C# Page Code'}
               </Label>
               <Textarea
@@ -321,6 +323,8 @@ const ElementEditor: React.FC<ElementEditorProps> = ({
                 placeholder={
                   editedElement.properties.scriptingMode === 'javascript' 
                     ? 'Enter your JavaScript code here...'
+                    : editedElement.properties.scriptingMode === 'vbnet'
+                    ? 'Dim message As String = "Hello World"'
                     : 'Enter your C# code here...'
                 }
                 className="min-h-[200px] font-mono text-sm"

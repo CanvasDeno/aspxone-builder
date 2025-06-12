@@ -188,11 +188,13 @@ const DraggableElement: React.FC<DraggableElementProps> = ({
       case 'csharp':
         const csharpCode = element.properties.scriptingMode === 'mvc' 
           ? `<% ${element.properties.code || ''} %>`
+          : element.properties.scriptingMode === 'vbnet'
+          ? `@Code\n${element.properties.code || ''}\nEnd Code`
           : `@{\n${element.properties.code || ''}\n}`;
         return (
           <div {...elementProps} className={`${baseClass} border border-gray-300 rounded p-3`}>
             <div className="text-sm font-semibold mb-2">
-              {element.content} ({element.properties.scriptingMode === 'mvc' ? 'MVC' : 'Razor'})
+              {element.content} ({element.properties.scriptingMode === 'mvc' ? 'MVC' : element.properties.scriptingMode === 'vbnet' ? 'VB.NET' : 'Razor'})
             </div>
             <pre className="text-xs font-mono p-2 rounded overflow-auto" style={{ backgroundColor: 'rgba(0,0,0,0.05)' }}>
               {csharpCode}
@@ -208,6 +210,9 @@ const DraggableElement: React.FC<DraggableElementProps> = ({
         } else if (element.properties.scriptingMode === 'mvc') {
           pageCode = `<%\n${element.properties.code || ''}\n%>`;
           modeLabel = 'MVC';
+        } else if (element.properties.scriptingMode === 'vbnet') {
+          pageCode = `@Code\n${element.properties.code || ''}\nEnd Code`;
+          modeLabel = 'VB.NET';
         } else {
           pageCode = element.properties.code || '';
           modeLabel = 'Razor';

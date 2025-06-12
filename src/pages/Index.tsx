@@ -16,7 +16,7 @@ export interface PageElement {
     src?: string;
     alt?: string;
     code?: string;
-    scriptingMode?: 'razor' | 'mvc' | 'javascript';
+    scriptingMode?: 'razor' | 'mvc' | 'javascript' | 'vbnet';
     backgroundColor?: string;
     textColor?: string;
     controls?: boolean;
@@ -208,10 +208,12 @@ ${baseIndent}${csharpCode}`;
 </script>`;
           } else if (element.properties.scriptingMode === 'mvc') {
             pageCode = `<%\n    ${element.properties.code?.replace(/\n/g, '\n    ') || ''}\n%>`;
+          } else if (element.properties.scriptingMode === 'vbnet') {
+            pageCode = `@Code\n    ${element.properties.code?.replace(/\n/g, '\n    ') || ''}\nEnd Code`;
           } else {
             pageCode = element.properties.code || '';
           }
-          return `${baseIndent}<!-- ${element.content} (${element.properties.scriptingMode === 'mvc' ? 'MVC' : element.properties.scriptingMode === 'javascript' ? 'JavaScript' : 'Razor'}) -->
+          return `${baseIndent}<!-- ${element.content} (${element.properties.scriptingMode === 'mvc' ? 'MVC' : element.properties.scriptingMode === 'javascript' ? 'JavaScript' : element.properties.scriptingMode === 'vbnet' ? 'VB.NET' : 'Razor'}) -->
 ${baseIndent}${pageCode}`;
         
         default:
@@ -232,6 +234,13 @@ ${baseIndent}${pageCode}`;
     const htmlContent = elements.map(element => renderElement(element)).join('\n\n');
     const currentDate = new Date().toLocaleDateString();
     const currentTime = new Date().toLocaleTimeString();
+
+    // Check if any element uses VB.NET to determine file extension
+    const hasVbNet = elements.some(el => 
+      (el.type === 'pagecode' || el.type === 'csharp') && 
+      el.properties.scriptingMode === 'vbnet'
+    );
+    const fileExtension = hasVbNet ? '.vbhtml' : '.cshtml';
 
     const fullHtml = `<!DOCTYPE html>
 <html lang="en">
@@ -281,7 +290,7 @@ ${htmlContent}
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'page.cshtml';
+    a.download = `page${fileExtension}`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);

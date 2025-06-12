@@ -47,7 +47,7 @@ const ElementToolbox: React.FC<ElementToolboxProps> = ({ onAddElement, onExport 
             onClick={onExport}
             className="w-full bg-green-600 hover:bg-green-700 text-white"
           >
-            Export as .cshtml
+            Export as .cshtml/.vbhtml
           </Button>
         </div>
       </CardContent>

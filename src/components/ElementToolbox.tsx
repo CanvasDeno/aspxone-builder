@@ -8,9 +8,10 @@ import { Type, FileText, Link, Square, Image, Code, FileCode, AudioLines, Video,
 interface ElementToolboxProps {
   onAddElement: (type: 'heading' | 'paragraph' | 'link' | 'button' | 'image' | 'csharp' | 'pagecode' | 'audio' | 'video' | 'navbar' | 'footer' | 'textbox') => void;
   onExport: () => void;
+  onExportVbNet: () => void;
 }
 
-const ElementToolbox: React.FC<ElementToolboxProps> = ({ onAddElement, onExport }) => {
+const ElementToolbox: React.FC<ElementToolboxProps> = ({ onAddElement, onExport, onExportVbNet }) => {
   const elementTypes = [
     { type: 'heading' as const, label: 'Add Heading', icon: Type },
     { type: 'paragraph' as const, label: 'Add Paragraph', icon: FileText },
@@ -42,12 +43,18 @@ const ElementToolbox: React.FC<ElementToolboxProps> = ({ onAddElement, onExport 
           />
         ))}
         
-        <div className="pt-4 border-t">
+        <div className="pt-4 border-t space-y-2">
           <Button 
             onClick={onExport}
             className="w-full bg-green-600 hover:bg-green-700 text-white"
           >
-            Export as .cshtml/.vbhtml
+            Export as .cshtml
+          </Button>
+          <Button 
+            onClick={onExportVbNet}
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+          >
+            Export as .vbhtml
           </Button>
         </div>
       </CardContent>

@@ -78,6 +78,51 @@ const Index = () => {
     });
   }, []);
 
+  const triggerJavaScript = useCallback(() => {
+    // Find all JavaScript code elements
+    const jsElements = elements.filter(el => 
+      (el.type === 'pagecode' && el.properties.scriptingMode === 'javascript')
+    );
+    
+    if (jsElements.length === 0) {
+      alert('No JavaScript code elements found on the page.');
+      return;
+    }
+
+    // Execute JavaScript code
+    jsElements.forEach(element => {
+      try {
+        if (element.properties.code) {
+          console.log(`Executing JavaScript from element: ${element.content}`);
+          // Use Function constructor for safer evaluation
+          const func = new Function(element.properties.code);
+          func();
+        }
+      } catch (error) {
+        console.error(`Error executing JavaScript from ${element.content}:`, error);
+        alert(`Error executing JavaScript from ${element.content}: ${error.message}`);
+      }
+    });
+  }, [elements]);
+
+  const triggerVbNet = useCallback(() => {
+    // Find all VB.NET code elements
+    const vbElements = elements.filter(el => 
+      ((el.type === 'pagecode' || el.type === 'csharp') && el.properties.scriptingMode === 'vbnet')
+    );
+    
+    if (vbElements.length === 0) {
+      alert('No VB.NET code elements found on the page.');
+      return;
+    }
+
+    // Since we can't actually execute VB.NET in the browser, we'll show the code
+    const vbCode = vbElements.map(el => `' ${el.content}\n${el.properties.code || ''}`).join('\n\n');
+    
+    console.log('VB.NET Code to execute:', vbCode);
+    alert(`VB.NET code found (cannot execute in browser):\n\n${vbCode.substring(0, 500)}${vbCode.length > 500 ? '...' : ''}`);
+  }, [elements]);
+
   const exportAsHtml = useCallback(() => {
     const indent = (level: number) => '  '.repeat(level);
     
@@ -521,7 +566,13 @@ ${htmlContent}
         <div className="max-w-7xl mx-auto p-4">
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 h-[calc(100vh-120px)]">
             <div className="lg:col-span-1">
-              <ElementToolbox onAddElement={addElement} onExport={exportAsHtml} onExportVbNet={exportAsVbNet} />
+              <ElementToolbox 
+                onAddElement={addElement} 
+                onExport={exportAsHtml} 
+                onExportVbNet={exportAsVbNet}
+                onTriggerJs={triggerJavaScript}
+                onTriggerVbNet={triggerVbNet}
+              />
             </div>
             
             <div className="lg:col-span-2">

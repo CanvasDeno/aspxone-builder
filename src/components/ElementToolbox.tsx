@@ -3,15 +3,17 @@ import React from 'react';
 import { useDrag } from 'react-dnd';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Type, FileText, Link, Square, Image, Code, FileCode, AudioLines, Video, Navigation, MapPin, FormInput } from 'lucide-react';
+import { Type, FileText, Link, Square, Image, Code, FileCode, AudioLines, Video, Navigation, MapPin, FormInput, Play } from 'lucide-react';
 
 interface ElementToolboxProps {
   onAddElement: (type: 'heading' | 'paragraph' | 'link' | 'button' | 'image' | 'csharp' | 'pagecode' | 'audio' | 'video' | 'navbar' | 'footer' | 'textbox') => void;
   onExport: () => void;
   onExportVbNet: () => void;
+  onTriggerJs: () => void;
+  onTriggerVbNet: () => void;
 }
 
-const ElementToolbox: React.FC<ElementToolboxProps> = ({ onAddElement, onExport, onExportVbNet }) => {
+const ElementToolbox: React.FC<ElementToolboxProps> = ({ onAddElement, onExport, onExportVbNet, onTriggerJs, onTriggerVbNet }) => {
   const elementTypes = [
     { type: 'heading' as const, label: 'Add Heading', icon: Type },
     { type: 'paragraph' as const, label: 'Add Paragraph', icon: FileText },
@@ -44,6 +46,23 @@ const ElementToolbox: React.FC<ElementToolboxProps> = ({ onAddElement, onExport,
         ))}
         
         <div className="pt-4 border-t space-y-2">
+          <Button 
+            onClick={onTriggerJs}
+            className="w-full bg-yellow-600 hover:bg-yellow-700 text-white"
+          >
+            <Play className="w-4 h-4 mr-2" />
+            Trigger JavaScript
+          </Button>
+          <Button 
+            onClick={onTriggerVbNet}
+            className="w-full bg-purple-600 hover:bg-purple-700 text-white"
+          >
+            <Play className="w-4 h-4 mr-2" />
+            Trigger VB.NET
+          </Button>
+        </div>
+        
+        <div className="pt-2 border-t space-y-2">
           <Button 
             onClick={onExport}
             className="w-full bg-green-600 hover:bg-green-700 text-white"

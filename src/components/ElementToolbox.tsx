@@ -10,10 +10,9 @@ interface ElementToolboxProps {
   onExport: () => void;
   onExportVbNet: () => void;
   onTriggerJs: () => void;
-  onTriggerVbNet: () => void;
 }
 
-const ElementToolbox: React.FC<ElementToolboxProps> = ({ onAddElement, onExport, onExportVbNet, onTriggerJs, onTriggerVbNet }) => {
+const ElementToolbox: React.FC<ElementToolboxProps> = ({ onAddElement, onExport, onExportVbNet, onTriggerJs }) => {
   const elementTypes = [
     { type: 'heading' as const, label: 'Add Heading', icon: Type },
     { type: 'paragraph' as const, label: 'Add Paragraph', icon: FileText },
@@ -53,13 +52,6 @@ const ElementToolbox: React.FC<ElementToolboxProps> = ({ onAddElement, onExport,
             <Play className="w-4 h-4 mr-2" />
             Trigger JavaScript
           </Button>
-          <Button 
-            onClick={onTriggerVbNet}
-            className="w-full bg-purple-600 hover:bg-purple-700 text-white"
-          >
-            <Play className="w-4 h-4 mr-2" />
-            Trigger VB.NET
-          </Button>
         </div>
         
         <div className="pt-2 border-t space-y-2">
@@ -67,13 +59,13 @@ const ElementToolbox: React.FC<ElementToolboxProps> = ({ onAddElement, onExport,
             onClick={onExport}
             className="w-full bg-green-600 hover:bg-green-700 text-white"
           >
-            Export as .cshtml
+            Export as .cshtml (Beta)
           </Button>
           <Button 
             onClick={onExportVbNet}
             className="w-full bg-blue-600 hover:bg-blue-700 text-white"
           >
-            Export as .vbhtml
+            Export as .vbhtml (Beta)
           </Button>
         </div>
       </CardContent>

@@ -571,7 +571,6 @@ ${htmlContent}
                 onExport={exportAsHtml} 
                 onExportVbNet={exportAsVbNet}
                 onTriggerJs={triggerJavaScript}
-                onTriggerVbNet={triggerVbNet}
               />
             </div>
             

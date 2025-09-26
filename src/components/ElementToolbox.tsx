@@ -44,26 +44,26 @@ const ElementToolbox: React.FC<ElementToolboxProps> = ({ onAddElement, onExport,
           />
         ))}
         
-        <div className="pt-4 border-t space-y-2">
+        <div className="pt-4 border-t border-border space-y-2">
           <Button 
             onClick={onTriggerJs}
-            className="w-full bg-yellow-600 hover:bg-yellow-700 text-white"
+            className="w-full bg-amber-600 hover:bg-amber-700 text-white dark:bg-amber-500 dark:hover:bg-amber-600"
           >
             <Play className="w-4 h-4 mr-2" />
             Trigger JavaScript
           </Button>
         </div>
         
-        <div className="pt-2 border-t space-y-2">
+        <div className="pt-2 border-t border-border space-y-2">
           <Button 
             onClick={onExport}
-            className="w-full bg-green-600 hover:bg-green-700 text-white"
+            className="w-full bg-emerald-600 hover:bg-emerald-700 text-white dark:bg-emerald-500 dark:hover:bg-emerald-600"
           >
             Export as .cshtml (Beta)
           </Button>
           <Button 
             onClick={onExportVbNet}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white dark:bg-blue-500 dark:hover:bg-blue-600"
           >
             Export as .vbhtml (Beta)
           </Button>
@@ -94,7 +94,7 @@ const DraggableButton: React.FC<DraggableButtonProps> = ({ type, label, icon: Ic
       ref={drag}
       variant="outline"
       className={`w-full justify-start gap-2 transition-all duration-200 ${
-        isDragging ? 'opacity-50 scale-95' : 'hover:bg-blue-50 hover:border-blue-300'
+        isDragging ? 'opacity-50 scale-95' : 'hover:bg-accent hover:text-accent-foreground'
       }`}
       onClick={onClick}
     >

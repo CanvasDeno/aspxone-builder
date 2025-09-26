@@ -41,7 +41,7 @@ const ElementEditor: React.FC<ElementEditorProps> = ({
           <CardTitle className="text-lg font-semibold">Edit Element</CardTitle>
         </CardHeader>
         <CardContent className="flex items-center justify-center h-32">
-          <p className="text-gray-500">Select an element to edit its properties</p>
+          <p className="text-muted-foreground">Select an element to edit its properties</p>
         </CardContent>
       </Card>
     );
@@ -175,7 +175,7 @@ const ElementEditor: React.FC<ElementEditorProps> = ({
           <div className="space-y-4">
             <Label>Navigation Items</Label>
             {(editedElement.properties.navItems || []).map((item: any, index: number) => (
-              <div key={index} className="border border-gray-200 rounded p-3 space-y-2">
+              <div key={index} className="border border-border rounded p-3 space-y-2">
                 <Input
                   value={item.text || ''}
                   onChange={(e) => handleNavItemChange(index, 'text', e.target.value)}

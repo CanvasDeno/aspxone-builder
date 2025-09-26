@@ -41,11 +41,11 @@ const PageCanvas: React.FC<PageCanvasProps> = ({
           <div
             ref={drop}
             className={`min-h-[500px] p-4 border-2 border-dashed rounded-lg transition-colors mx-4 my-4 flex flex-col ${
-              isOver ? 'border-blue-400 bg-blue-50' : 'border-gray-300'
+              isOver ? 'border-primary bg-primary/5' : 'border-muted-foreground/30'
             }`}
           >
             {elements.length === 0 ? (
-              <div className="flex items-center justify-center h-full text-gray-500">
+              <div className="flex items-center justify-center h-full text-muted-foreground">
                 <p>Drag elements here or click "Add" buttons to start building your page</p>
               </div>
             ) : (
@@ -64,8 +64,8 @@ const PageCanvas: React.FC<PageCanvasProps> = ({
             )}
             
             {isOver && (
-              <div className="absolute inset-0 bg-blue-100 bg-opacity-50 rounded-lg flex items-center justify-center">
-                <p className="text-blue-700 font-medium">Drop element here</p>
+              <div className="absolute inset-0 bg-primary/10 rounded-lg flex items-center justify-center">
+                <p className="text-primary font-medium">Drop element here</p>
               </div>
             )}
           </div>
